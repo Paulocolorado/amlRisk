@@ -27,7 +27,7 @@ public class UsuarioFacadeLocalImpl extends AbstractFacade<Usuario> implements U
 
     public UsuarioFacadeLocalImpl() {
         super(Usuario.class);        
-        this.emf= Persistence.createEntityManagerFactory("sisgriPU");
+        this.emf = Persistence.createEntityManagerFactory("sisgriPU");
         this.em = emf.createEntityManager();
     }
     

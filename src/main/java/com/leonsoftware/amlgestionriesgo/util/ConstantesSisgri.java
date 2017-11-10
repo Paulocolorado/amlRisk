@@ -25,6 +25,8 @@ public class ConstantesSisgri {
     public static final boolean FALSO = false;
     public static final boolean VERDADERO = true;
     public static final Double PORCENTAJE_CIEN = new Double(100);
+    public static final String PROCESADO_NO = "0";
+    public static final String PROCESADO_SI = "1";
     
     
     

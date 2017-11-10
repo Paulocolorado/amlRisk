@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,6 +34,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author karol
  */
 @Entity
+@Cacheable(false)
 @Table(name = "tb_archivo_cliente_masivo")
 @XmlRootElement
 @NamedQueries({
@@ -40,10 +43,17 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "ArchivoClienteMasivo.findByNombreArchivoCliMasivo", query = "SELECT a FROM ArchivoClienteMasivo a WHERE a.nombreArchivoCliMasivo = :nombreArchivoCliMasivo")
     , @NamedQuery(name = "ArchivoClienteMasivo.findByFechaCarga", query = "SELECT a FROM ArchivoClienteMasivo a WHERE a.fechaCarga = :fechaCarga")
     , @NamedQuery(name = "ArchivoClienteMasivo.findByFechaCreacion", query = "SELECT a FROM ArchivoClienteMasivo a WHERE a.fechaCreacion = :fechaCreacion")
+    , @NamedQuery(name = "ArchivoClienteMasivo.findByProcesado", query = "SELECT a FROM ArchivoClienteMasivo a WHERE a.procesado = :procesado")
     , @NamedQuery(name = "ArchivoClienteMasivo.findByUsuarioCreacion", query = "SELECT a FROM ArchivoClienteMasivo a WHERE a.usuarioCreacion = :usuarioCreacion")
     , @NamedQuery(name = "ArchivoClienteMasivo.findByFechaModificacion", query = "SELECT a FROM ArchivoClienteMasivo a WHERE a.fechaModificacion = :fechaModificacion")
     , @NamedQuery(name = "ArchivoClienteMasivo.findByUsuarioModificacion", query = "SELECT a FROM ArchivoClienteMasivo a WHERE a.usuarioModificacion = :usuarioModificacion")})
 public class ArchivoClienteMasivo implements Serializable {
+
+    @Basic(optional = false)
+    @NotNull
+    @Lob
+    @Column(name = "archivo_cargado")
+    private byte[] archivoCargado;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -59,14 +69,14 @@ public class ArchivoClienteMasivo implements Serializable {
     @Column(name = "fecha_carga")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCarga;
-    @Basic(optional = false)
-    @NotNull
-    @Lob
-    @Column(name = "archivo_cargado")
-    private byte[] archivoCargado;
     @Column(name = "fecha_creacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 2)
+    @Column(name = "procesado")
+    private String procesado;
     @Size(max = 15)
     @Column(name = "usuario_creacion")
     private String usuarioCreacion;
@@ -81,7 +91,7 @@ public class ArchivoClienteMasivo implements Serializable {
         , @JoinColumn(name = "tb_usuario_tipo_id_usuario", referencedColumnName = "tipo_id_usuario")})
     @ManyToOne(optional = false)
     private Usuario usuario;
-    @OneToMany(mappedBy = "idArchivoCliMasivo")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "archivoClienteMasivo")
     private Collection<ClienteMasivo> clienteMasivoCollection;
 
     public ArchivoClienteMasivo() {
@@ -91,10 +101,11 @@ public class ArchivoClienteMasivo implements Serializable {
         this.idArchivoCliMasivo = idArchivoCliMasivo;
     }
 
-    public ArchivoClienteMasivo(Integer idArchivoCliMasivo, String nombreArchivoCliMasivo, byte[] archivoCargado) {
+    public ArchivoClienteMasivo(Integer idArchivoCliMasivo, String nombreArchivoCliMasivo, byte[] archivoCargado, String procesado) {
         this.idArchivoCliMasivo = idArchivoCliMasivo;
         this.nombreArchivoCliMasivo = nombreArchivoCliMasivo;
         this.archivoCargado = archivoCargado;
+        this.procesado = procesado;
     }
 
     public Integer getIdArchivoCliMasivo() {
@@ -135,6 +146,14 @@ public class ArchivoClienteMasivo implements Serializable {
 
     public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getProcesado() {
+        return procesado;
+    }
+
+    public void setProcesado(String procesado) {
+        this.procesado = procesado;
     }
 
     public String getUsuarioCreacion() {
@@ -200,7 +219,7 @@ public class ArchivoClienteMasivo implements Serializable {
 
     @Override
     public String toString() {
-        return "com.leonsoftware.amlgestionriesgo.amlrisktomcat.ArchivoClienteMasivo[ idArchivoCliMasivo=" + idArchivoCliMasivo + " ]";
+        return "com.leonsoftware.amlgestionriesgo.model.ArchivoClienteMasivo[ idArchivoCliMasivo=" + idArchivoCliMasivo + " ]";
     }
     
 }

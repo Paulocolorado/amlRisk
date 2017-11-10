@@ -29,13 +29,18 @@ public class ClienteMasivoPK implements Serializable {
     @Size(min = 1, max = 45)
     @Column(name = "id_cliente")
     private String idCliente;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "id_archivo_cli_masivo")
+    private int idArchivoCliMasivo;
 
     public ClienteMasivoPK() {
     }
 
-    public ClienteMasivoPK(String tipoIdCliente, String idCliente) {
+    public ClienteMasivoPK(String tipoIdCliente, String idCliente, int idArchivoCliMasivo) {
         this.tipoIdCliente = tipoIdCliente;
         this.idCliente = idCliente;
+        this.idArchivoCliMasivo = idArchivoCliMasivo;
     }
 
     public String getTipoIdCliente() {
@@ -54,11 +59,20 @@ public class ClienteMasivoPK implements Serializable {
         this.idCliente = idCliente;
     }
 
+    public int getIdArchivoCliMasivo() {
+        return idArchivoCliMasivo;
+    }
+
+    public void setIdArchivoCliMasivo(int idArchivoCliMasivo) {
+        this.idArchivoCliMasivo = idArchivoCliMasivo;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (tipoIdCliente != null ? tipoIdCliente.hashCode() : 0);
         hash += (idCliente != null ? idCliente.hashCode() : 0);
+        hash += (int) idArchivoCliMasivo;
         return hash;
     }
 
@@ -75,12 +89,15 @@ public class ClienteMasivoPK implements Serializable {
         if ((this.idCliente == null && other.idCliente != null) || (this.idCliente != null && !this.idCliente.equals(other.idCliente))) {
             return false;
         }
+        if (this.idArchivoCliMasivo != other.idArchivoCliMasivo) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "com.leonsoftware.amlgestionriesgo.amlrisktomcat.ClienteMasivoPK[ tipoIdCliente=" + tipoIdCliente + ", idCliente=" + idCliente + " ]";
+        return "com.leonsoftware.amlgestionriesgo.model.ClienteMasivoPK[ tipoIdCliente=" + tipoIdCliente + ", idCliente=" + idCliente + ", idArchivoCliMasivo=" + idArchivoCliMasivo + " ]";
     }
     
 }

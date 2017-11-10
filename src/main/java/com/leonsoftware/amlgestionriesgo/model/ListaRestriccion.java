@@ -180,10 +180,7 @@ public class ListaRestriccion implements Serializable {
             return false;
         }
         ListaRestriccion other = (ListaRestriccion) object;
-        if ((this.listaRestriccionPK == null && other.listaRestriccionPK != null) || (this.listaRestriccionPK != null && !this.listaRestriccionPK.equals(other.listaRestriccionPK))) {
-            return false;
-        }
-        return true;
+        return !((this.listaRestriccionPK == null && other.listaRestriccionPK != null) || (this.listaRestriccionPK != null && !this.listaRestriccionPK.equals(other.listaRestriccionPK)));
     }
 
     @Override
@@ -198,5 +195,7 @@ public class ListaRestriccion implements Serializable {
     public void setPorcentaje(Double porcentaje) {
         this.porcentaje = porcentaje;
     }
+
+
     
 }

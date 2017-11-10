@@ -48,6 +48,12 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "ArchivoFuente.findByUsuarioModificacion", query = "SELECT a FROM ArchivoFuente a WHERE a.usuarioModificacion = :usuarioModificacion")})
 public class ArchivoFuente implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Lob
+    @Column(name = "archivo_cargado")
+    private byte[] archivoCargado;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -72,11 +78,6 @@ public class ArchivoFuente implements Serializable {
     @Column(name = "fecha_carga")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCarga;
-    @Basic(optional = false)
-    @NotNull
-    @Lob
-    @Column(name = "archivo_cargado")
-    private byte[] archivoCargado;
     @Column(name = "fecha_creacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;

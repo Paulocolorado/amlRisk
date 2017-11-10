@@ -8,15 +8,16 @@ import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2017-11-03T19:34:42")
+@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2017-11-10T01:39:51")
 @StaticMetamodel(ArchivoClienteMasivo.class)
 public class ArchivoClienteMasivo_ { 
 
     public static volatile SingularAttribute<ArchivoClienteMasivo, Date> fechaCarga;
     public static volatile CollectionAttribute<ArchivoClienteMasivo, ClienteMasivo> clienteMasivoCollection;
     public static volatile SingularAttribute<ArchivoClienteMasivo, Date> fechaModificacion;
-    public static volatile SingularAttribute<ArchivoClienteMasivo, Integer> idArchivoCliMasivo;
     public static volatile SingularAttribute<ArchivoClienteMasivo, byte[]> archivoCargado;
+    public static volatile SingularAttribute<ArchivoClienteMasivo, Integer> idArchivoCliMasivo;
+    public static volatile SingularAttribute<ArchivoClienteMasivo, String> procesado;
     public static volatile SingularAttribute<ArchivoClienteMasivo, Date> fechaCreacion;
     public static volatile SingularAttribute<ArchivoClienteMasivo, String> usuarioModificacion;
     public static volatile SingularAttribute<ArchivoClienteMasivo, Usuario> usuario;

@@ -6,7 +6,9 @@
 package com.leonsoftware.amlgestionriesgo.ejb;
 
 import com.leonsoftware.amlgestionriesgo.exception.SisgriException;
+import com.leonsoftware.amlgestionriesgo.model.ArchivoClienteMasivo;
 import com.leonsoftware.amlgestionriesgo.model.ArchivoFuente;
+import com.leonsoftware.amlgestionriesgo.model.CruceClienteLista;
 import com.leonsoftware.amlgestionriesgo.model.ListaRestriccion;
 import java.util.List;
 import javax.ejb.Local;
@@ -22,4 +24,11 @@ public interface ArchivoFacadeLocal {
     
     public List<ListaRestriccion> buscarListaCoincidencia(String[] parametros) throws SisgriException;
     
+    public void guardarArchivoCliente(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException;
+    
+    public List<ArchivoClienteMasivo> consultaArchivoMasivo() throws SisgriException;
+    
+    public void cruzarClientes(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException;
+    
+    public List<CruceClienteLista> consultarCruceClienteLista(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException;
 }

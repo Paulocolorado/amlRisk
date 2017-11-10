@@ -63,7 +63,9 @@ public class ConsultaListaController implements Serializable{
         this.mensajes = new UtilitarioLeonSoftware().cargarMensajes();
     }
     
-    
+    /**
+     * Encuentra coincidencias con el criterio ingresado
+     */
     public void buscarCoincidencia(){
         LOGGER.info("LOGGER :: ConsultaListaController :: buscarCoincidencia");     
         this.visualizaResultado = true;

@@ -21,12 +21,16 @@
                                 </center>
                             </h:panelGrid>      
                             <center>  
-                                <p:commandButton value="#{msj.buscar}"  update="frmConsultaLista" action="#{consultaListaController.buscarCoincidencia()}" tabindex="3"/>
+                                <p:commandButton id="btnBuscar" value="#{msj.buscar}"  update="frmConsultaLista" action="#{consultaListaController.buscarCoincidencia()}" tabindex="3"/>
+                                <p:blockUI block=":frmConsultaLista:pnlConsultaLista" trigger="btnBuscar">
+                                    #{msj.buscandoCoincidencias}<br/>
+                                            <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
+                                </p:blockUI>
                             </center>    
                             <br/>
                             <br/>                                           
                             <p:panel id="pnlResultadoConsultaLista" header="#{msj.resultadoConsulta}" rendered="#{consultaListaController.visualizaResultado}"> 
-                                <p:dataTable var="clienteCoincide" value="#{consultaListaController.listaClienteCoincide}" paginator="true" rows="10" styleClass="paginated" emptyMessage="#{msj.mensajeNoEncontro}" paginatorPosition="bottom"  >
+                                <p:dataTable id="dtClienteCoincide" var="clienteCoincide" value="#{consultaListaController.listaClienteCoincide}" paginator="true" rows="10" styleClass="paginated" emptyMessage="#{msj.mensajeNoEncontro}" paginatorPosition="bottom"  >
                                     
                                     <p:column headerText="#{msj.porcentajeCoincidencia}">
                                         <h:outputText value="#{clienteCoincide.porcentaje}%" />
@@ -51,7 +55,9 @@
                                 </p:dataTable> 
                                 <f:facet name="footer" >
                                     <center>
-                                        <p:commandButton value="#{msj.descarga}"  action="#{consultaListaController.descargaLista()}" tabindex="4" />
+                                        <h:commandLink value="#{msj.descarga}">                                         
+                                            <p:dataExporter type="csv" target="dtClienteCoincide" fileName="#{msj.descarga}" />
+                                        </h:commandLink>
                                     </center>
                                 </f:facet>    
                             </p:panel>

@@ -32,8 +32,6 @@ import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.DefaultUploadedFile;
-import org.primefaces.model.UploadedFile;
 
 /**
  *
@@ -51,9 +49,9 @@ public class CargaArchivoController implements Serializable{
     
     private ResourceBundle mensajes;
     private ArchivoFuente archivoFuente;
-    private UploadedFile archivo;
     private List<ListaCatalogo> listaAccion;
     private List<ListaCatalogo> listaFuente;
+    private boolean ocultarBoton;
     
     /**
      * Constructor
@@ -62,9 +60,9 @@ public class CargaArchivoController implements Serializable{
         LOGGER.info("LOGGER :: CargaArchivoController :: Construct");
         this.mensajes = null;
         this.archivoFuente = new ArchivoFuente();
-        this.archivo = null;
         this.listaAccion = null;
         this.listaFuente = null;
+        this.ocultarBoton = true;
     }
 
     /**
@@ -73,12 +71,12 @@ public class CargaArchivoController implements Serializable{
     @PostConstruct
     public void init(){
         LOGGER.info("LOGGER :: CargaArchivoController :: init");
-        this.archivo = new DefaultUploadedFile(); 
         this.mensajes = new UtilitarioLeonSoftware().cargarMensajes();
         this.listaFuente = new ArrayList<ListaCatalogo>(); 
         this.listaAccion = new ArrayList<ListaCatalogo>();
         this.EJBcatalogo = new CatalogoFacade();
         this.EJBArchivo = new ArchivoFacade();
+        this.ocultarBoton = true;
     }
     
     /**
@@ -101,15 +99,16 @@ public class CargaArchivoController implements Serializable{
     public void cargarArchivoListener(FileUploadEvent e){
         try {
             LOGGER.info("LOGGER :: CargaArchivoController :: cargarArchivoListener");
-            this.archivo = e.getFile();
+            this.archivoFuente.setNombreArchivoFuente(e.getFile().getFileName());
             this.archivoFuente.setArchivoCargado(IOUtils.toByteArray(e.getFile().getInputstream()));
-            if(this.archivo != null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,this.archivo.getFileName() + this.mensajes.getString(ConstantesSisgri.MSJ_CARGA_OK), null));
+            if(e.getFile() != null) {
+                this.ocultarBoton = false;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.archivoFuente.getNombreArchivoFuente() + "->" + this.mensajes.getString(ConstantesSisgri.MSJ_CARGA_OK), null));
             }else{
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), null));            
             }
         }catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivo.getFileName() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_LECTURA_ARCHIVO), ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_LECTURA_ARCHIVO), ex.getMessage()));
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }    
@@ -124,8 +123,7 @@ public class CargaArchivoController implements Serializable{
         fechaActual.get(Calendar.YEAR);
         fechaActual.get(Calendar.MONTH);
         fechaActual.get(Calendar.DAY_OF_MONTH); 
-        try{            
-            this.archivoFuente.setNombreArchivoFuente(this.archivo.getFileName());
+        try{                        
             this.archivoFuente.setFechaCarga(fechaActual.getTime());
             this.archivoFuente.setFechaCreacion(fechaActual.getTime());
             this.archivoFuente.setFechaModificacion(fechaActual.getTime());            
@@ -135,23 +133,16 @@ public class CargaArchivoController implements Serializable{
             this.EJBArchivo.guardarArchivo(this.archivoFuente);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,this.mensajes.getString(ConstantesSisgri.MSJ_GUARDA_ARCHIVO_OK), null));
         }catch (SisgriException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivo.getFileName() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_GUARDA_ARCHIVO), ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_GUARDA_ARCHIVO), ex.getMessage()));
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
             }
     }    
     
+
     
     /*
     * Metodos SET y GET
     */
-
-    public UploadedFile getArchivo() {
-        return archivo;
-    }
-
-    public void setArchivo(UploadedFile archivo) {
-        this.archivo = archivo;
-    }
 
     public static Logger getLOGGER() {
         return LOGGER;
@@ -203,5 +194,13 @@ public class CargaArchivoController implements Serializable{
 
     public void setEJBArchivo(ArchivoFacadeLocal EJBArchivo) {
         this.EJBArchivo = EJBArchivo;
+    }
+    
+    public boolean isOcultarBoton() {
+        return ocultarBoton;
+    }
+
+    public void setOcultarBoton(boolean ocultarBoton) {
+        this.ocultarBoton = ocultarBoton;
     }
 }

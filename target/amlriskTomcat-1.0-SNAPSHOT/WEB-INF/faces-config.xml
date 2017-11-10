@@ -41,6 +41,18 @@
             <managed-bean-scope>view</managed-bean-scope>
         </managed-bean>
         
+        <managed-bean>
+            <managed-bean-name>cargaArchivoClienteController</managed-bean-name>
+            <managed-bean-class>com.leonsoftware.amlgestionriesgo.controller.cargaFuentes.CargaArchivoClienteController</managed-bean-class>
+            <managed-bean-scope>view</managed-bean-scope>
+        </managed-bean>
+        
+        <managed-bean>
+            <managed-bean-name>consultaListaMasivoController</managed-bean-name>
+            <managed-bean-class>com.leonsoftware.amlgestionriesgo.controller.consultaListas.ConsultaListaMasivoController</managed-bean-class>
+            <managed-bean-scope>view</managed-bean-scope>
+        </managed-bean>
+        
     </application>
 
 </faces-config>

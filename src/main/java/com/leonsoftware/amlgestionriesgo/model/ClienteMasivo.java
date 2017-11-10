@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "ClienteMasivo.findByFechaCreacion", query = "SELECT c FROM ClienteMasivo c WHERE c.fechaCreacion = :fechaCreacion")
     , @NamedQuery(name = "ClienteMasivo.findByUsuarioCreacion", query = "SELECT c FROM ClienteMasivo c WHERE c.usuarioCreacion = :usuarioCreacion")
     , @NamedQuery(name = "ClienteMasivo.findByFechaModificacion", query = "SELECT c FROM ClienteMasivo c WHERE c.fechaModificacion = :fechaModificacion")
-    , @NamedQuery(name = "ClienteMasivo.findByUsuarioModificacion", query = "SELECT c FROM ClienteMasivo c WHERE c.usuarioModificacion = :usuarioModificacion")})
+    , @NamedQuery(name = "ClienteMasivo.findByUsuarioModificacion", query = "SELECT c FROM ClienteMasivo c WHERE c.usuarioModificacion = :usuarioModificacion")
+    , @NamedQuery(name = "ClienteMasivo.findByIdArchivoCliMasivo", query = "SELECT c FROM ClienteMasivo c WHERE c.clienteMasivoPK.idArchivoCliMasivo = :idArchivoCliMasivo")})
 public class ClienteMasivo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -60,9 +61,9 @@ public class ClienteMasivo implements Serializable {
     @Size(max = 45)
     @Column(name = "usuario_modificacion")
     private String usuarioModificacion;
-    @JoinColumn(name = "id_archivo_cli_masivo", referencedColumnName = "id_archivo_cli_masivo")
-    @ManyToOne
-    private ArchivoClienteMasivo idArchivoCliMasivo;
+    @JoinColumn(name = "id_archivo_cli_masivo", referencedColumnName = "id_archivo_cli_masivo", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private ArchivoClienteMasivo archivoClienteMasivo;
 
     public ClienteMasivo() {
     }
@@ -71,8 +72,8 @@ public class ClienteMasivo implements Serializable {
         this.clienteMasivoPK = clienteMasivoPK;
     }
 
-    public ClienteMasivo(String tipoIdCliente, String idCliente) {
-        this.clienteMasivoPK = new ClienteMasivoPK(tipoIdCliente, idCliente);
+    public ClienteMasivo(String tipoIdCliente, String idCliente, int idArchivoCliMasivo) {
+        this.clienteMasivoPK = new ClienteMasivoPK(tipoIdCliente, idCliente, idArchivoCliMasivo);
     }
 
     public ClienteMasivoPK getClienteMasivoPK() {
@@ -131,12 +132,12 @@ public class ClienteMasivo implements Serializable {
         this.usuarioModificacion = usuarioModificacion;
     }
 
-    public ArchivoClienteMasivo getIdArchivoCliMasivo() {
-        return idArchivoCliMasivo;
+    public ArchivoClienteMasivo getArchivoClienteMasivo() {
+        return archivoClienteMasivo;
     }
 
-    public void setIdArchivoCliMasivo(ArchivoClienteMasivo idArchivoCliMasivo) {
-        this.idArchivoCliMasivo = idArchivoCliMasivo;
+    public void setArchivoClienteMasivo(ArchivoClienteMasivo archivoClienteMasivo) {
+        this.archivoClienteMasivo = archivoClienteMasivo;
     }
 
     @Override
@@ -161,7 +162,7 @@ public class ClienteMasivo implements Serializable {
 
     @Override
     public String toString() {
-        return "com.leonsoftware.amlgestionriesgo.amlrisktomcat.ClienteMasivo[ clienteMasivoPK=" + clienteMasivoPK + " ]";
+        return "com.leonsoftware.amlgestionriesgo.model.ClienteMasivo[ clienteMasivoPK=" + clienteMasivoPK + " ]";
     }
     
 }
