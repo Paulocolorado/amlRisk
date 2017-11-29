@@ -53,7 +53,9 @@ public class AutenticacionController implements Serializable{
         }  
         return urlAutentica;
     }
-
+public String loggout (){
+    return "/autenticacion";
+}
     
     /*
     * Metodos SET y GET

@@ -1,12 +1,3 @@
-/*
-Scripts de creacion inicializacion de datos AMLRisk
-version : 1.0
-creado: 07/11/2017
-*/
-CREATE DATABASE `bd_sisgri`;
-
-
-
 
 CREATE TABLE `tb_usuario` (
   `tipo_id_usuario` varchar(3) NOT NULL COMMENT 'tipo de identificaciòn de usuario',
@@ -191,10 +182,28 @@ INSERT INTO `tb_lista_catalogo` VALUES ('Externa','EXTERNA','2017-10-09 14:59:50
 INSERT INTO `tb_lista_catalogo` VALUES ('Ofac','OFAC','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
 INSERT INTO `tb_lista_catalogo` VALUES ('Onu','ONU','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
 
+/* funciones*/
 
---funciones
---version 1.0
 
+
+DELIMITER $$
+CREATE FUNCTION `fnc_obtenerNumEtiqueta`(pfuente varchar(50)) RETURNS int(11)
+BEGIN
+DECLARE  numEtiqueta INT DEFAULT 1;
+DECLARE  nomFuente varchar(50)  DEFAULT trim(pfuente);
+
+SELECT count(*)
+INTO numEtiqueta
+FROM tb_lista_catalogo
+WHERE tb_catalogo_id_catalogo = nomFuente
+AND nombre_lista_catalogo like 'nodo%';
+
+RETURN numEtiqueta;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
 CREATE FUNCTION `fnc_obtenerEtiqueta`(pfuente varchar(50), pParametro varchar(50)) RETURNS varchar(50) CHARSET utf8
 BEGIN
 DECLARE  nomEtiqueta varchar(50)  DEFAULT ' ';
@@ -209,28 +218,14 @@ group by tb_catalogo_id_catalogo;
 
 
 RETURN nomEtiqueta;
-END;
-
----
-
-CREATE FUNCTION `fnc_obtenerNumEtiqueta`(pfuente varchar(50)) RETURNS int(11)
-BEGIN
-DECLARE  numEtiqueta INT DEFAULT 1;
-DECLARE  nomFuente varchar(50)  DEFAULT trim(pfuente);
-
-SELECT count(*)
-INTO numEtiqueta
-FROM tb_lista_catalogo
-WHERE tb_catalogo_id_catalogo = nomFuente
-AND nombre_lista_catalogo like 'nodo%';
-
-RETURN numEtiqueta;
-END;
+END$$
+DELIMITER ;
 
 
---disparadores
---VERSION 1.0
+DELIMITER $$
 
+DROP TRIGGER IF EXISTS bd_sisgri.tb_archivo_cliente_masivo_AFTER_INSERT$$
+USE `bd_sisgri`$$
 CREATE TRIGGER `bd_sisgri`.`tb_archivo_cliente_masivo_AFTER_INSERT` AFTER INSERT ON `tb_archivo_cliente_masivo` FOR EACH ROW
 BEGIN
 
@@ -284,9 +279,15 @@ SET separador 	   := fnc_obtenerEtiqueta(CONST_NOM_CATALOGO, separador);
 		
 	 END WHILE;   
 
-END;
------------------
+END$$
+DELIMITER ;
 
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS bd_sisgri.tg_archivo_fuente$$
+USE `bd_sisgri`$$
 CREATE TRIGGER tg_archivo_fuente AFTER INSERT ON tb_archivo_fuente FOR EACH ROW
 BEGIN
 
@@ -429,11 +430,13 @@ ELSE
 END IF;		
 		
  
-END;
+END$$
+DELIMITER ;
 
---procedimientos
---VERSION 1.0
+DROP procedure IF EXISTS `prc_cruzar_listas_clientes`;
 
+DELIMITER $$
+USE `bd_sisgri`$$
 CREATE PROCEDURE `prc_cruzar_listas_clientes`(IN idArchivoCliente INT)
 BEGIN    
 
@@ -499,7 +502,10 @@ BEGIN
 	 WHERE id_archivo_cli_masivo = idArchivoCliente;
      
      commit;
-END;
+END$$
+
+DELIMITER ;
+
 
 
 

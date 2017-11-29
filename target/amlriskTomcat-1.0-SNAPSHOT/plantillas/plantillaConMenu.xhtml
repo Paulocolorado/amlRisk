@@ -35,6 +35,8 @@
                                 <p:menuitem value="#{msj.subMnuCargaLista}" action="/cargaFuentes/cruceMasivoLista"  />
                                 <p:menuitem value="#{msj.subMnuConsultaLista}" action="/consultaListas/consultaMasivoLista"  />
                             </p:submenu>
+                            <p:separator />
+                            <p:menuitem value="#{msj.salir}" action="#{autenticacionController.loggout()}" />
                         </p:menubar>
                     </h:form> 
                 </ui:insert>
