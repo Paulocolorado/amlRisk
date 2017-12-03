@@ -7,7 +7,7 @@
 
     <session-config>
         <session-timeout>
-            30
+            600
         </session-timeout>
     </session-config>
     <servlet>
