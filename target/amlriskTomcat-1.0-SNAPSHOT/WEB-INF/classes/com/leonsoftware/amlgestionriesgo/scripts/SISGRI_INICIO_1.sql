@@ -1,4 +1,5 @@
 
+
 CREATE TABLE `tb_usuario` (
   `tipo_id_usuario` varchar(3) NOT NULL COMMENT 'tipo de identificaciòn de usuario',
   `id_usuario` int(11) NOT NULL COMMENT 'identificacion del usuario',
@@ -16,6 +17,7 @@ CREATE TABLE `tb_usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla para el manejo de usuarios del Sistema SISGRI';
 
 
+
 CREATE TABLE `tb_trazabilidad` (
   `fecha_trazabilidad` datetime NOT NULL,
   `valor_trazabilidad` varchar(500) DEFAULT NULL
@@ -31,6 +33,7 @@ CREATE TABLE `tb_catalogo` (
   `usuario_modificacion` varchar(15) DEFAULT NULL COMMENT 'auditoria - usuario de modificaciòn del registro ',
   PRIMARY KEY (`id_catalogo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla para el manejo de catalogos de la aplicación';
+
 
 
 CREATE TABLE `tb_lista_catalogo` (
@@ -85,6 +88,7 @@ CREATE TABLE `tb_archivo_fuente` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+
 CREATE TABLE `tb_cliente_masivo` (
   `tipo_id_cliente` varchar(15) NOT NULL COMMENT 'Tipo de identificacion del cliente a verificar relacionado con la lista FUENTE_RIESGO',
   `id_cliente` varchar(45) NOT NULL COMMENT 'Identificacion del cliente',
@@ -118,25 +122,42 @@ CREATE TABLE `tb_cruce_cliente_lista` (
   PRIMARY KEY (`id_registro`),
   KEY `idx_id_archivo_cliente` (`id_archivo_cli_masivo`),
   KEY `idx_id_cliente` (`id_cliente`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla que permite almacenar la relacion existente entre la t';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla que permite almacenar la relacion existente';
 
 
 CREATE TABLE `tb_lista_restriccion` (
   `lista_id_registro` double NOT NULL COMMENT 'Onu: DATAID\nOfac: uid',
-  `lista_primer_nombre` varchar(500) DEFAULT NULL COMMENT 'Onu: FIRST_NAME\nOfac: firstName',
-  `lista_ultimo_nombre` varchar(500) DEFAULT NULL COMMENT 'Onu: SECOND_NAME\nOfac: lastName',
+  `lista_primer_nombre` varchar(500) CHARACTER SET utf8 DEFAULT NULL COMMENT 'Onu: FIRST_NAME\nOfac: firstName',
+  `lista_ultimo_nombre` varchar(500) CHARACTER SET utf8 DEFAULT NULL COMMENT 'Onu: SECOND_NAME\nOfac: lastName',
   `lista_fecha_reporte` datetime DEFAULT NULL COMMENT 'Onu: LISTED_ON\nOfac: n/a',
-  `lista_observacion` varchar(5000) DEFAULT NULL COMMENT 'Onu: COMMENTS1\nOfac: title',
+  `lista_observacion` varchar(5000) CHARACTER SET utf8 DEFAULT NULL COMMENT 'Onu: COMMENTS1\nOfac: title',
   `fecha_creacion` datetime DEFAULT NULL COMMENT 'auditoria - fecha de creaciòn del registro ',
-  `usuario_creacion` varchar(15) DEFAULT NULL COMMENT 'auditoria - usuario de creaciòn del registro ',
+  `usuario_creacion` varchar(15) CHARACTER SET utf8 DEFAULT NULL COMMENT 'auditoria - usuario de creaciòn del registro ',
   `fecha_modificacion` datetime DEFAULT NULL COMMENT 'auditoria - fecha de modificaciòn del registro ',
-  `usuario_modificacion` varchar(15) DEFAULT NULL COMMENT 'auditoria - usuario de modificaciòn del registro ',
+  `usuario_modificacion` varchar(15) CHARACTER SET utf8 DEFAULT NULL COMMENT 'auditoria - usuario de modificaciòn del registro ',
   `tb_archivo_fuente_id_archivo_fuente` int(11) NOT NULL,
   PRIMARY KEY (`lista_id_registro`,`tb_archivo_fuente_id_archivo_fuente`),
   KEY `IDX_NOMBRE` (`lista_primer_nombre`,`lista_ultimo_nombre`),
-  KEY `fk_tb_lista_restriccion_tb_archivo_fuente1_idx` (`tb_archivo_fuente_id_archivo_fuente`),
-  CONSTRAINT `fk_tb_lista_restriccion_tb_archivo_fuente1` FOREIGN KEY (`tb_archivo_fuente_id_archivo_fuente`) REFERENCES `tb_archivo_fuente` (`id_archivo_fuente`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla que mantiene las listas restrictivas';
+  KEY `fk_archivo_fuente_lista_idx` (`tb_archivo_fuente_id_archivo_fuente`),
+  CONSTRAINT `fk_archivo_fuente_lista` FOREIGN KEY (`tb_archivo_fuente_id_archivo_fuente`) REFERENCES `tb_archivo_fuente` (`id_archivo_fuente`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci COMMENT='Tabla que mantiene las listas restrictivas';
+
+
+CREATE TABLE `tb_lista_id_restriccion` (
+  `lista_id_restriccion_id` double NOT NULL,
+  `tipo_id` varchar(50) DEFAULT NULL,
+  `numero_id` varchar(50) NOT NULL,
+  `pais_id` varchar(50) DEFAULT NULL,
+  `fecha_creacion` datetime NOT NULL,
+  `usuario_creacion` varchar(15) NOT NULL,
+  `fecha_modificacion` datetime NOT NULL,
+  `usuario_modificacion` varchar(15) NOT NULL,
+  `tb_lista_restriccion_lista_id_registro` double NOT NULL,
+  `tb_archivo_fuente_id_archivo_fuente` int(11) NOT NULL,
+  PRIMARY KEY (`lista_id_restriccion_id`,`tb_archivo_fuente_id_archivo_fuente`,`tb_lista_restriccion_lista_id_registro`),
+  KEY `fk_tb_lista_id_restriccion_tb_lista_restriccion1_idx` (`tb_lista_restriccion_lista_id_registro`,`tb_archivo_fuente_id_archivo_fuente`),
+  CONSTRAINT `fk_tb_lista_id_restriccion_tb_lista_restriccion1` FOREIGN KEY (`tb_lista_restriccion_lista_id_registro`, `tb_archivo_fuente_id_archivo_fuente`) REFERENCES `tb_lista_restriccion` (`lista_id_registro`, `tb_archivo_fuente_id_archivo_fuente`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='tabla que almacena las diferentes identificaciones asginadas';
 
 
 /*
@@ -162,25 +183,29 @@ INSERT INTO `tb_catalogo` VALUES ('TXT_CLIENTE', '2017-10-17 14:59:50', 'adminSi
 Tabla tb_lista_catalogo
 */
 
-INSERT INTO `tb_lista_catalogo` VALUES ('separador',',','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TXT_CLIENTE');
-INSERT INTO `tb_lista_catalogo` VALUES ('separador',',','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TXT_EXTERNA');
-INSERT INTO `tb_lista_catalogo` VALUES ('nodo2','//ENTITIES/ENTITY','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_ONU');
-INSERT INTO `tb_lista_catalogo` VALUES ('nodo1','//INDIVIDUALS/INDIVIDUAL','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_ONU');
-INSERT INTO `tb_lista_catalogo` VALUES ('nodo1','//sdnEntry','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
-INSERT INTO `tb_lista_catalogo` VALUES ('observacion','/COMMENTS1','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
-INSERT INTO `tb_lista_catalogo` VALUES ('nombre_uno','/firstName','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
-INSERT INTO `tb_lista_catalogo` VALUES ('nombre_uno','/FIRST_NAME','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
-INSERT INTO `tb_lista_catalogo` VALUES ('nombre_dos','/lastName','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
-INSERT INTO `tb_lista_catalogo` VALUES ('fecha_reporte','/LISTED_ON','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
-INSERT INTO `tb_lista_catalogo` VALUES ('fecha_reporte','/LISTED_ON','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
-INSERT INTO `tb_lista_catalogo` VALUES ('nombre_dos','/SECOND_NAME','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
-INSERT INTO `tb_lista_catalogo` VALUES ('observacion','/title','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
-INSERT INTO `tb_lista_catalogo` VALUES ('CEDULA CIUDADANIA','CC','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TIPO_ID');
-INSERT INTO `tb_lista_catalogo` VALUES ('CEDULA DE EXTRANJERIA','CE','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TIPO_ID');
-INSERT INTO `tb_lista_catalogo` VALUES ('Carga','CRG','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','ACCION_ARCHIVO');
-INSERT INTO `tb_lista_catalogo` VALUES ('Externa','EXTERNA','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
-INSERT INTO `tb_lista_catalogo` VALUES ('Ofac','OFAC','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
-INSERT INTO `tb_lista_catalogo` VALUES ('Onu','ONU','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('separador',',','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TXT_CLIENTE');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('separador',',','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TXT_EXTERNA');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('nodo2','//ENTITIES/ENTITY','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_ONU');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('nodo1','//INDIVIDUALS/INDIVIDUAL','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_ONU');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('nodo1','//sdnEntry','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('observacion','/COMMENTS1','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('nombre_uno','/firstName','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('nombre_uno','/FIRST_NAME','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('pais_id','/idCountry','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('snodo1','/idList/id','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('numero_id','/idNumber','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('tipo_id','/idType','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('nombre_dos','/lastName','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('fecha_reporte','/LISTED_ON','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('fecha_reporte','/LISTED_ON','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('nombre_dos','/SECOND_NAME','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSIsgri','XML_ONU');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('observacion','/title','2017-10-17 14:59:50','adminSisgri','2017-10-17 14:59:50','adminSisgri','XML_OFAC');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('CEDULA CIUDADANIA','CC','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TIPO_ID');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('CEDULA DE EXTRANJERIA','CE','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','TIPO_ID');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('Carga','CRG','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','ACCION_ARCHIVO');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('Externa','EXTERNA','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('Ofac','OFAC','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
+INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,`fecha_creacion`,`usuario_creacion`,`fecha_modificacion`,`usuario_modificacion`,`tb_catalogo_id_catalogo`) VALUES ('Onu','ONU','2017-10-09 14:59:50','adminSisgri','2017-10-09 14:59:50','adminSIsgri','FUENTE_RIESGO');
 
 /* funciones*/
 
@@ -213,8 +238,7 @@ SELECT valor_lista_catalogo
 INTO nomEtiqueta
 FROM tb_lista_catalogo
 WHERE tb_catalogo_id_catalogo = nomFuente
-AND nombre_lista_catalogo = pParametro
-group by tb_catalogo_id_catalogo;
+AND nombre_lista_catalogo = pParametro;
 
 
 RETURN nomEtiqueta;
@@ -313,18 +337,32 @@ BEGIN
  DECLARE longitud double DEFAULT 1;
  DECLARE separador TEXT DEFAULT 'separador';
  
+ DECLARE tipo_id TEXT DEFAULT 'tipo_id';
+ DECLARE numero_id TEXT DEFAULT 'numero_id';
+ DECLARE pais_id TEXT DEFAULT 'pais_id';
+ DECLARE nodoID TEXT DEFAULT 'snodo1';
+ DECLARE k INT UNSIGNED DEFAULT 0;
+ DECLARE num_reg_ID INT UNSIGNED;
+
+ DECLARE xpathID TEXT;
  
- 	 /*Auditoria*/
+ 
+ 	 /*Auditoria
 	 INSERT INTO tb_trazabilidad (fecha_trazabilidad, valor_trazabilidad) values
 	 (now(), concat('nombre_archivo_fuente:',NEW.nombre_archivo_fuente));
-	 
+	 */
  
  IF (lower(NEW.nombre_archivo_fuente) LIKE lower(concat('%',CONST_XML,'%'))) THEN
  
+	DELETE id.*
+    FROM tb_archivo_fuente a, tb_lista_restriccion id
+	WHERE a.id_archivo_fuente = id.tb_archivo_fuente_id_archivo_fuente
+    AND a.nombre_fuente = NEW.nombre_fuente;
+    
 	DELETE l.* 
     FROM  tb_archivo_fuente a, tb_lista_restriccion l 
     WHERE a.id_archivo_fuente = l.tb_archivo_fuente_id_archivo_fuente
-    AND nombre_fuente = NEW.nombre_fuente;
+    AND a.nombre_fuente = NEW.nombre_fuente;
  
 	 SET nombre_fuente  := concat(CONST_XML,CONST_LIN_INF,NEW.nombre_fuente);
  
@@ -333,7 +371,13 @@ BEGIN
 	 SET nombre_dos 	:= fnc_obtenerEtiqueta(nombre_fuente, nombre_dos); 
 	 SET observacion 	:= fnc_obtenerEtiqueta(nombre_fuente, observacion);
 	 SET num_reg 	    := fnc_obtenerNumEtiqueta(nombre_fuente);
-	 
+     
+	 SET tipo_id    := fnc_obtenerEtiqueta(nombre_fuente, tipo_id);
+	 SET numero_id 	:= fnc_obtenerEtiqueta(nombre_fuente, numero_id);
+	 SET pais_id 	:= fnc_obtenerEtiqueta(nombre_fuente, pais_id); 
+	 SET nodoID 	:= fnc_obtenerEtiqueta(nombre_fuente, nodoID);
+          
+     
 	 /*Auditoria
 	 INSERT INTO tb_trazabilidad (fecha_trazabilidad, valor_trazabilidad) values
 	 (now(), concat('fecha:',fecha_reporte,' nombre_uno',nombre_uno,' nombre_dos ',nombre_dos,' observacion', observacion ,' num_etiqueta ',num_etiqueta, ' NEW.nombre_fuente: ',NEW.nombre_fuente));
@@ -354,7 +398,7 @@ BEGIN
 			SET i := i + 1;
 			SET contador := contador + 1;
 			SET xpath := concat(nodo,'[', i, ']');
-			
+                        
 			/* Auditoria
 			INSERT INTO tb_trazabilidad (fecha_trazabilidad, valor_trazabilidad) values
 			(now(), concat('***xpath:',xpath,' I:',i));		*/
@@ -381,6 +425,46 @@ BEGIN
 			now(),
 			NEW.usuario_modificacion,
 			NEW.id_archivo_fuente);
+            
+            /*ini:Bloque para recorrer arreglo de id OFAC*/
+			SET num_reg_ID := extractValue(NEW.archivo_cargado, concat('count(',concat(xpath,'/idList/id',')')));
+            
+            
+			WHILE k < num_reg_ID DO
+				SET k := k + 1;
+				SET xpathID := concat(xpath,nodoID,'[',k,']');
+            
+            /*Auditoria
+				INSERT INTO tb_trazabilidad (fecha_trazabilidad, valor_trazabilidad) values
+				(now(), concat('num_reg_ID:',num_reg_ID,'i:',i,'xpath',xpath));	
+			*/
+			
+            INSERT INTO tb_lista_id_restriccion
+			(lista_id_restriccion_id,
+             tipo_id,
+             numero_id,
+             pais_id,
+             fecha_creacion,
+			 usuario_creacion,
+			 fecha_modificacion,
+			 usuario_modificacion,
+             tb_lista_restriccion_lista_id_registro,
+             tb_archivo_fuente_id_archivo_fuente)
+			 VALUES
+			(k,
+             extractValue(NEW.archivo_cargado, concat(xpathID, tipo_id)),
+			 extractValue(NEW.archivo_cargado, concat(xpathID, numero_id)),
+             extractValue(NEW.archivo_cargado, concat(xpathID, pais_id)),
+             now(),
+			 NEW.usuario_creacion,
+			 now(),
+			 NEW.usuario_modificacion,
+             contador,
+             NEW.id_archivo_fuente);
+             
+            END WHILE;
+             
+            /*fin:Bloque para recorrer arreglo de id OFAC*/ 
 		 
 		 END WHILE;
 		END WHILE; 
