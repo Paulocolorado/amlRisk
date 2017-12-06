@@ -5,8 +5,11 @@
  */
 package com.leonsoftware.amlgestionriesgo.model;
 
+import com.leonsoftware.amlgestionriesgo.util.ConstantesSisgri;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -41,6 +45,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "ListaRestriccion.findByUsuarioModificacion", query = "SELECT l FROM ListaRestriccion l WHERE l.usuarioModificacion = :usuarioModificacion")
     , @NamedQuery(name = "ListaRestriccion.findByTbArchivoFuenteIdArchivoFuente", query = "SELECT l FROM ListaRestriccion l WHERE l.listaRestriccionPK.tbArchivoFuenteIdArchivoFuente = :tbArchivoFuenteIdArchivoFuente")})
 public class ListaRestriccion implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "listaRestriccion")
+    private Collection<ListaIdRestriccion> listaIdRestriccionCollection;
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -74,7 +81,10 @@ public class ListaRestriccion implements Serializable {
     private ArchivoFuente archivoFuente;
     @Transient
     private Double porcentaje;    
+    @Transient
+    private String idCompleta;    
 
+    
     public ListaRestriccion() {
     }
 
@@ -192,10 +202,32 @@ public class ListaRestriccion implements Serializable {
         return porcentaje;
     }
 
-    public void setPorcentaje(Double porcentaje) {
+    public void setPorcentaje(Double porcentaje) {      
         this.porcentaje = porcentaje;
     }
 
+    public Collection<ListaIdRestriccion> getListaIdRestriccionCollection() {
+        return listaIdRestriccionCollection;
+    }
 
+    public void setListaIdRestriccionCollection(Collection<ListaIdRestriccion> listaIdRestriccionCollection) {        
+        this.listaIdRestriccionCollection = listaIdRestriccionCollection;
+    }
+    
+    /**
+     * Metodo que convierte las identificaciones en un sólo campo cadena
+     * @return 
+     */
+    public String getIdCompleta() {
+        String idAuxCompleta = "";
+        for(ListaIdRestriccion listaIdRestriccion : this.listaIdRestriccionCollection){   
+            idAuxCompleta = idAuxCompleta.concat(listaIdRestriccion.getTipoId().concat(ConstantesSisgri.ESPACIO_BLANCO).concat(listaIdRestriccion.getNumeroId()).concat(ConstantesSisgri.ESPACIO_BLANCO).concat(listaIdRestriccion.getPaisId()).concat(ConstantesSisgri.SEPARADOR));
+        }
+        return idAuxCompleta;
+    }
+
+    public void setIdCompleta(String idCompleta) {
+        this.idCompleta = idCompleta;
+    }
     
 }

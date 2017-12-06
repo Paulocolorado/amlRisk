@@ -27,7 +27,8 @@ public class ConstantesSisgri {
     public static final Double PORCENTAJE_CIEN = new Double(100);
     public static final String PROCESADO_NO = "0";
     public static final String PROCESADO_SI = "1";
-    
+    public static final String SEPARADOR = " : ";
+    public static final String VACIO = "";
     
     
 }

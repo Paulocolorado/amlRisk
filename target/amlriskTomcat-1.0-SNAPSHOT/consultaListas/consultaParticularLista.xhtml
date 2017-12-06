@@ -14,18 +14,25 @@
                 <h:form id="frmConsultaLista" enctype="multipart/form-data">
                     <h:panelGrid id="pnlgConsultaLista" style="width:100%">  
                         <p:panel id="pnlConsultaLista" header="#{msj.mnuConsultaLista}" >  
-                            <h:panelGrid columns="4" style="width:100%" styleClass="right_content" cellpadding="10px">                          
-                                <center>
-                                    <p:outputLabel for="nombreApCliente" value="#{msj.nombreCliente}"  />
-                                    <p:inputText id="nombreApCliente" value="#{consultaListaController.nombreApCliente}" tabindex="1" maxlength="40" size="40"/>                                
-                                </center>
-                            </h:panelGrid>      
+                            <h:panelGrid columns="4" style="width:100%" cellpadding="10px">                          
+ 
+                                <p:outputLabel for="nombreApCliente" value="#{msj.nombreCliente}"  />
+                                <p:inputText id="nombreApCliente" value="#{consultaListaController.nombreApCliente}" tabindex="1" maxlength="40" size="40"/>                                
+
+                                <p:outputLabel for="numeroID" value="#{msj.numIdCliente}"  />
+                                <p:inputText id="numeroID" value="#{consultaListaController.numeroID}" tabindex="2" maxlength="40" size="40"/>  
+
+                            </h:panelGrid> 
+                            <br/>
+                            <br/>
                             <center>  
                                 <p:commandButton id="btnBuscar" value="#{msj.buscar}"  update="frmConsultaLista" action="#{consultaListaController.buscarCoincidencia()}" tabindex="3"/>
                                 <p:blockUI block=":frmConsultaLista:pnlConsultaLista" trigger="btnBuscar">
                                     #{msj.buscandoCoincidencias}<br/>
-                                            <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
+                                     <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
                                 </p:blockUI>
+                                <p:spacer width="20" />
+                                <p:commandButton id="btnLimpiar" value="#{msj.limpiar}"  update="frmConsultaLista" action="#{consultaListaController.limpiarFormulario()}" tabindex="4"/>
                             </center>    
                             <br/>
                             <br/>                                           
@@ -37,11 +44,11 @@
                                     </p:column>
 
                                     <p:column headerText="#{msj.numIdCliente}">
-                                        <h:outputText value="#{clienteCoincide.listaPrimerNombre}" />
+                                        <h:outputText value="#{clienteCoincide.idCompleta}" />
                                     </p:column>
 
                                     <p:column headerText="#{msj.nombreCliente}">
-                                        <h:outputText value="#{clienteCoincide.listaUltimoNombre}" />
+                                        <h:outputText value="#{clienteCoincide.listaPrimerNombre} #{clienteCoincide.listaUltimoNombre}" />
                                     </p:column>
 
                                     <p:column headerText="#{msj.fuenteInforme}">

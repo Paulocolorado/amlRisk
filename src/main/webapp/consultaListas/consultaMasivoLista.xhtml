@@ -39,56 +39,65 @@
                                             <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
                                         </p:blockUI>
                                 </p:column>                                
-                            </p:dataTable>                                                          
+                            </p:dataTable>    
                             
-                                <p:dialog header="#{msj.resultadoCruce}" widgetVar="clienteCruce" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                                    <p:outputPanel id="pnlResultadoCruce" style="text-align:center;">
-                                        
-                                            <p:dataTable  id="dtClienteCoincide" var="clienteCruce" value="#{consultaListaMasivoController.listaCruceClienteLista}" paginator="true" rows="10" styleClass="paginated" emptyMessage="#{msj.mensajeNoEncontro}" paginatorPosition="bottom">
-                                                
-                                                <p:column headerText="#{msj.tipoIdCliente}">
-                                                    <h:outputText value="#{clienteCruce.tipoIdCliente}" />
-                                                </p:column>
-                                                                                                
-                                                <p:column headerText="#{msj.numIdCliente}">
-                                                    <h:outputText value="#{clienteCruce.idCliente}" />
-                                                </p:column>
-                                                
-                                                <p:column headerText="#{msj.primerNombreCliente}">
-                                                    <h:outputText value="#{clienteCruce.clientePrimerNombre}" />
-                                                </p:column>
-                                                
-                                                <p:column headerText="#{msj.ultimoNombreCliente}">
-                                                    <h:outputText value="#{clienteCruce.clienteUltimoNombre}" />
-                                                </p:column>
-                                               
-                                                <p:column headerText="#{msj.primerNombreLista}">
-                                                    <h:outputText value="#{clienteCruce.listaPrimerNombre}" />
-                                                </p:column>
-                                                                                                
-                                                <p:column headerText="#{msj.ultimoNombreLista}">
-                                                    <h:outputText value="#{clienteCruce.listaUltimoNombre}" />
-                                                </p:column>
-                                                                                                
-                                                <p:column headerText="#{msj.fuenteInforme}">
-                                                    <h:outputText value="#{clienteCruce.nombreFuente}" />
-                                                </p:column>
-                                                
-                                                <p:column headerText="#{msj.porcentajeCoincidencia}">
-                                                    <h:outputText value="#{clienteCruce.porcentaje}" />
-                                                </p:column>                               
-                                            </p:dataTable>  
-                                            
-                                            <f:facet name="footer" >
-                                            <center>
-                                                <h:commandLink value="#{msj.descarga}">                                         
-                                                    <p:dataExporter type="csv" target="dtClienteCoincide" fileName="#{msj.descarga}" />
-                                                </h:commandLink>
-                                            </center>
-                                            </f:facet> 
+                            
+                            <p:dialog header="#{msj.resultadoCruce}" widgetVar="clienteCruce" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                                <p:outputPanel id="pnlResultadoCruce" style="text-align:center;">
 
-                                    </p:outputPanel>
-                                </p:dialog>
+                                        <p:dataTable  id="dtClienteCoincide" var="clienteCruce" value="#{consultaListaMasivoController.listaCruceClienteLista}" paginator="true" rows="10" styleClass="paginated" emptyMessage="#{msj.mensajeNoEncontro}" paginatorPosition="bottom">
+
+                                            <p:column headerText="#{msj.tipoIdCliente}">
+                                                <h:outputText value="#{clienteCruce.tipoIdCliente}" />
+                                            </p:column>
+
+                                            <p:column headerText="#{msj.numIdCliente}">
+                                                <h:outputText value="#{clienteCruce.idCliente}" />
+                                            </p:column>
+
+                                            <p:column headerText="#{msj.primerNombreCliente}">
+                                                <h:outputText value="#{clienteCruce.clientePrimerNombre}" />
+                                            </p:column>
+
+                                            <p:column headerText="#{msj.ultimoNombreCliente}">
+                                                <h:outputText value="#{clienteCruce.clienteUltimoNombre}" />
+                                            </p:column>
+
+                                            <p:column headerText="#{msj.primerNombreLista}">
+                                                <h:outputText value="#{clienteCruce.listaPrimerNombre}" />
+                                            </p:column>
+
+                                            <p:column headerText="#{msj.ultimoNombreLista}">
+                                                <h:outputText value="#{clienteCruce.listaUltimoNombre}" />
+                                            </p:column>
+
+                                            <p:column headerText="#{msj.fuenteInforme}">
+                                                <h:outputText value="#{clienteCruce.nombreFuente}" />
+                                            </p:column>
+
+                                            <p:column headerText="#{msj.porcentajeCoincidencia}">
+                                                <h:outputText value="#{clienteCruce.porcentaje}" />
+                                            </p:column>                               
+                                        </p:dataTable>  
+
+                                        <f:facet name="footer" >
+                                        <center>
+                                            <h:commandLink value="#{msj.descarga}">                                         
+                                                <p:dataExporter type="csv" target="dtClienteCoincide" fileName="#{msj.descarga}" />
+                                            </h:commandLink>
+                                        </center>
+                                        </f:facet> 
+
+                                </p:outputPanel>
+                                
+                                <f:facet name="footer" >
+                                    <center>
+                                        <h:commandLink value="#{msj.descarga}">                                         
+                                            <p:dataExporter type="csv" target="dtClienteCoincide" fileName="#{msj.descarga}" />
+                                        </h:commandLink>
+                                    </center>
+                                </f:facet> 
+                            </p:dialog>
                             
                         </p:panel>   
                        

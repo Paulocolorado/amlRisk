@@ -101,21 +101,29 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
      * @throws SisgriException 
      */ 
     @Override
-     public List<ListaRestriccion> buscarListaCoincidencia(String[] parametros) throws SisgriException{         
+     public List<ListaRestriccion> buscarListaCoincidencia(String[] parametros, String pNumeroID) throws SisgriException{         
         String consulta; 
         boolean bandera = ConstantesSisgri.FALSO;
         String condicion = ConstantesSisgri.ESPACIO_BLANCO;
+
         List<ListaRestriccion> listaClienteCoincide = new ArrayList();         
         try{
-            for (String parametro : parametros) {
-                if(bandera){
-                    condicion = condicion + " OR ";
+            if(!pNumeroID.equals(ConstantesSisgri.VACIO)){
+                consulta = " SELECT DISTINCT l FROM ListaRestriccion l, ListaIdRestriccion id  WHERE "+
+                           " l.listaRestriccionPK.listaIdRegistro = id.listaIdRestriccionPK.tbListaRestriccionListaIdRegistro AND " +
+                           " l.listaRestriccionPK.tbArchivoFuenteIdArchivoFuente = id.listaIdRestriccionPK.tbArchivoFuenteIdArchivoFuente AND " +
+                           " id.numeroId LIKE trim(lower('%" + pNumeroID + "%')) ";                     
+            }else{
+                for (String parametro : parametros) {
+                    if(bandera){
+                        condicion = condicion + " OR ";
+                    }
+                    condicion = condicion + " trim(lower(l.listaPrimerNombre)) LIKE trim(lower('%" + parametro + "%')) OR " 
+                                          + " trim(lower(l.listaUltimoNombre)) LIKE trim(lower('%" + parametro + "%')) ";                
+                    bandera = ConstantesSisgri.VERDADERO;
                 }
-                condicion = condicion + " trim(lower(l.listaPrimerNombre)) LIKE trim(lower('%" + parametro + "%')) OR " 
-                                      + " trim(lower(L.listaUltimoNombre)) LIKE trim(lower('%" + parametro + "%')) ";                
-                bandera = ConstantesSisgri.VERDADERO;
-            }
-            consulta = "SELECT DISTINCT l FROM ListaRestriccion l WHERE " + condicion;                     
+                consulta = "SELECT DISTINCT l FROM ListaRestriccion l  WHERE " + condicion;                     
+            }            
             Query q = this.em.createQuery(consulta);          
             listaClienteCoincide = q.getResultList();
         }catch(Exception e){
