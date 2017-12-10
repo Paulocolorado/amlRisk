@@ -140,7 +140,7 @@ CREATE TABLE `tb_lista_restriccion` (
   KEY `IDX_NOMBRE` (`lista_primer_nombre`,`lista_ultimo_nombre`),
   KEY `fk_archivo_fuente_lista_idx` (`tb_archivo_fuente_id_archivo_fuente`),
   CONSTRAINT `fk_archivo_fuente_lista` FOREIGN KEY (`tb_archivo_fuente_id_archivo_fuente`) REFERENCES `tb_archivo_fuente` (`id_archivo_fuente`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci COMMENT='Tabla que mantiene las listas restrictivas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla que mantiene las listas restrictivas';
 
 
 CREATE TABLE `tb_lista_id_restriccion` (
@@ -429,7 +429,7 @@ BEGIN
             /*ini:Bloque para recorrer arreglo de id OFAC*/
 			SET num_reg_ID := extractValue(NEW.archivo_cargado, concat('count(',concat(xpath,'/idList/id',')')));
             
-            
+            SET k := 0;
 			WHILE k < num_reg_ID DO
 				SET k := k + 1;
 				SET xpathID := concat(xpath,nodoID,'[',k,']');

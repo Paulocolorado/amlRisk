@@ -30,5 +30,10 @@ public class ConstantesSisgri {
     public static final String SEPARADOR = " : ";
     public static final String VACIO = "";
     
+    public static final String FUENTE_OFAC = "OFAC";
+    public static final String FUENTE_ONU = "ONU";
+    public static final String FUENTE_EXTERNA = "EXTERNA";
+    public static final String SEPARADOR_ARCH_TEXTO = ",";
+    
     
 }

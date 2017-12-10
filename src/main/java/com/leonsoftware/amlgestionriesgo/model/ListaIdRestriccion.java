@@ -59,22 +59,18 @@ public class ListaIdRestriccion implements Serializable {
     @Column(name = "pais_id")
     private String paisId;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecha_creacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "usuario_creacion")
     private String usuarioCreacion;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecha_modificacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 15)
     @Column(name = "usuario_modificacion")
     private String usuarioModificacion;

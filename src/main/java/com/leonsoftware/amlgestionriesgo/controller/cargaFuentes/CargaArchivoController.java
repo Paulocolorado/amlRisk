@@ -12,14 +12,25 @@ import com.leonsoftware.amlgestionriesgo.ejb.CatalogoFacadeLocal;
 import com.leonsoftware.amlgestionriesgo.exception.SisgriException;
 import com.leonsoftware.amlgestionriesgo.model.ArchivoFuente;
 import com.leonsoftware.amlgestionriesgo.model.ListaCatalogo;
+import com.leonsoftware.amlgestionriesgo.model.ListaIdRestriccion;
+import com.leonsoftware.amlgestionriesgo.model.ListaIdRestriccionPK;
+import com.leonsoftware.amlgestionriesgo.model.ListaRestriccion;
+import com.leonsoftware.amlgestionriesgo.model.ListaRestriccionPK;
 import com.leonsoftware.amlgestionriesgo.model.Usuario;
 import com.leonsoftware.amlgestionriesgo.util.ConstantesSisgri;
 import com.leonsoftware.amlgestionriesgo.util.UtilitarioLeonSoftware;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,9 +40,18 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.UploadedFile;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -52,6 +72,9 @@ public class CargaArchivoController implements Serializable{
     private List<ListaCatalogo> listaAccion;
     private List<ListaCatalogo> listaFuente;
     private boolean ocultarBoton;
+    private Usuario usuario;
+    private UploadedFile uploadedFile;
+
     
     /**
      * Constructor
@@ -63,6 +86,7 @@ public class CargaArchivoController implements Serializable{
         this.listaAccion = null;
         this.listaFuente = null;
         this.ocultarBoton = true;
+        this.usuario = null;
     }
 
     /**
@@ -77,6 +101,7 @@ public class CargaArchivoController implements Serializable{
         this.EJBcatalogo = new CatalogoFacade();
         this.EJBArchivo = new ArchivoFacade();
         this.ocultarBoton = true;
+        this.usuario =  (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
     }
     
     /**
@@ -102,6 +127,7 @@ public class CargaArchivoController implements Serializable{
             this.archivoFuente.setNombreArchivoFuente(e.getFile().getFileName());
             this.archivoFuente.setArchivoCargado(IOUtils.toByteArray(e.getFile().getInputstream()));
             if(e.getFile() != null) {
+                this.uploadedFile = e.getFile();
                 this.ocultarBoton = false;
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.archivoFuente.getNombreArchivoFuente() + "->" + this.mensajes.getString(ConstantesSisgri.MSJ_CARGA_OK), null));
             }else{
@@ -113,23 +139,223 @@ public class CargaArchivoController implements Serializable{
         }
     }    
 
+    
+    /**
+     * Metodo que permite recorrer el xml de OFAC
+     * 
+     * @param archivoFuente 
+     */
+    private void recorrerArchivoFuenteOFAC(Calendar fechaActual){
+        LOGGER.info("LOGGER :: recorrerArchivoFuente :: recorrerArchivoFuenteOFAC");
+        ListaRestriccion  listaRestriccion = null;
+        ListaIdRestriccion listaIdRestriccion = null;
+        List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
+        List<ListaIdRestriccion> listaIdRestriccionCollection = new ArrayList<ListaIdRestriccion>();
+        try {            
+            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder;
+            documentBuilder = dbf.newDocumentBuilder();
+            Document document = documentBuilder.parse(this.uploadedFile.getInputstream());
+            document.getDocumentElement().normalize();
+            NodeList listaNodo = document.getElementsByTagName("sdnEntry");            
+            for(int temp = 0; temp < listaNodo.getLength(); temp++){                
+                Node nodo = listaNodo.item(temp);
+                listaRestriccion = new ListaRestriccion();
+                listaRestriccion.setListaRestriccionPK(new ListaRestriccionPK());
+                if (nodo.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) nodo;     
+                    listaRestriccion.getListaRestriccionPK().setListaIdRegistro(temp);
+                    listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                    listaRestriccion.setListaPrimerNombre(element.getElementsByTagName("firstName").item(0) == null ? ConstantesSisgri.VACIO : element.getElementsByTagName("firstName").item(0).getTextContent());
+                    listaRestriccion.setListaUltimoNombre(element.getElementsByTagName("lastName").item(0) == null ? ConstantesSisgri.VACIO : element.getElementsByTagName("lastName").item(0).getTextContent());
+                    listaRestriccion.setListaObservacion(element.getElementsByTagName("title").item(0) == null ? ConstantesSisgri.VACIO : element.getElementsByTagName("title").item(0).getTextContent());
+                    listaRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                    listaRestriccion.setFechaCreacion(fechaActual.getTime());
+                    listaRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                    listaRestriccion.setFechaModificacion(fechaActual.getTime());
+                    
+                    NodeList sublistaID = element.getElementsByTagName("id");
+                    for(int j = 0; j < sublistaID.getLength(); j++){      
+                        Node nodoID = sublistaID.item(j);
+                        listaIdRestriccion = new ListaIdRestriccion();
+                        Element elementID = (Element) nodoID;                                  
+                        listaIdRestriccion.setListaIdRestriccionPK(new ListaIdRestriccionPK());
+                        listaIdRestriccion.getListaIdRestriccionPK().setListaIdRestriccionId(j);
+                        listaIdRestriccion.getListaIdRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                        listaIdRestriccion.getListaIdRestriccionPK().setTbListaRestriccionListaIdRegistro(temp);
+                        listaIdRestriccion.setTipoId(elementID.getElementsByTagName("idType").item(0) == null ? ConstantesSisgri.VACIO : elementID.getElementsByTagName("idType").item(0).getTextContent());
+                        listaIdRestriccion.setNumeroId(elementID.getElementsByTagName("idNumber").item(0) == null ? ConstantesSisgri.VACIO : elementID.getElementsByTagName("idNumber").item(0).getTextContent());
+                        listaIdRestriccion.setPaisId(elementID.getElementsByTagName("idCountry").item(0) == null ? ConstantesSisgri.VACIO : elementID.getElementsByTagName("idCountry").item(0).getTextContent()); 
+                        listaIdRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                        listaIdRestriccion.setFechaCreacion(fechaActual.getTime());
+                        listaIdRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                        listaIdRestriccion.setFechaModificacion(fechaActual.getTime());
+                        listaIdRestriccionCollection.add(listaIdRestriccion);
+                    }
+                }  
+                listaRestriccion.setListaIdRestriccionCollection(listaIdRestriccionCollection);
+                listaRestriccionCollection.add(listaRestriccion);
+            }
+            this.archivoFuente.setListaRestriccionCollection(listaRestriccionCollection);
+            this.archivoFuente.setIdArchivoFuente(idArchivo);
+        } catch (ParserConfigurationException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SisgriException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+         
+    }   
+    
+    /**
+     * Metodo que permite recorrer el xml de OFAC
+     * 
+     * @param fechaActual 
+     */
+    private void recorrerArchivoFuenteONU(Calendar fechaActual){
+        LOGGER.info("LOGGER :: recorrerArchivoFuente :: recorrerArchivoFuenteONU");
+        ListaRestriccion  listaRestriccion = null;
+        List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
+        int sigIdLista = 0;
+        try {            
+            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder;
+            documentBuilder = dbf.newDocumentBuilder();
+            Document document = documentBuilder.parse(this.uploadedFile.getInputstream());
+            document.getDocumentElement().normalize();
+            NodeList listaNodo1 = document.getElementsByTagName("INDIVIDUAL");            
+            NodeList listaNodo2 = document.getElementsByTagName("ENTITY");   
+            sigIdLista = listaNodo1.getLength();
+            for(int temp = 0; temp < sigIdLista; temp++){                
+                Node nodo1 = listaNodo1.item(temp);
+                listaRestriccion = new ListaRestriccion();
+                listaRestriccion.setListaRestriccionPK(new ListaRestriccionPK());
+                if (nodo1.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element1 = (Element) nodo1;     
+                    listaRestriccion.getListaRestriccionPK().setListaIdRegistro(temp);
+                    listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                    listaRestriccion.setListaPrimerNombre(element1.getElementsByTagName("FIRST_NAME").item(0) == null ? ConstantesSisgri.VACIO : element1.getElementsByTagName("FIRST_NAME").item(0).getTextContent());
+                    listaRestriccion.setListaUltimoNombre(element1.getElementsByTagName("SECOND_NAME").item(0) == null ? ConstantesSisgri.VACIO : element1.getElementsByTagName("SECOND_NAME").item(0).getTextContent());
+                    listaRestriccion.setListaObservacion(element1.getElementsByTagName("COMMENTS1").item(0) == null ? ConstantesSisgri.VACIO : element1.getElementsByTagName("COMMENTS1").item(0).getTextContent());
+                    listaRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                    listaRestriccion.setFechaCreacion(fechaActual.getTime());
+                    listaRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                    listaRestriccion.setFechaModificacion(fechaActual.getTime());
+                }
+                listaRestriccionCollection.add(listaRestriccion);
+            }    
+                   
+            for(int j = 0; j < listaNodo2.getLength(); j++){      
+                Node nodo2 = listaNodo2.item(j);
+                listaRestriccion = new ListaRestriccion();
+                listaRestriccion.setListaRestriccionPK(new ListaRestriccionPK());
+                sigIdLista = sigIdLista + 1;
+                if (nodo2.getNodeType() == Node.ELEMENT_NODE) {           
+                    Element element2 = (Element) nodo2;                                     
+                    listaRestriccion.getListaRestriccionPK().setListaIdRegistro(sigIdLista);
+                    listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                    listaRestriccion.setListaPrimerNombre(element2.getElementsByTagName("FIRST_NAME").item(0) == null ? ConstantesSisgri.VACIO : element2.getElementsByTagName("FIRST_NAME").item(0).getTextContent());
+                    listaRestriccion.setListaUltimoNombre(element2.getElementsByTagName("SECOND_NAME").item(0) == null ? ConstantesSisgri.VACIO : element2.getElementsByTagName("SECOND_NAME").item(0).getTextContent());
+                    listaRestriccion.setListaObservacion(element2.getElementsByTagName("COMMENTS1").item(0) == null ? ConstantesSisgri.VACIO : element2.getElementsByTagName("COMMENTS1").item(0).getTextContent());
+                    listaRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                    listaRestriccion.setFechaCreacion(fechaActual.getTime());
+                    listaRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                    listaRestriccion.setFechaModificacion(fechaActual.getTime());
+                }   
+            listaRestriccionCollection.add(listaRestriccion);    
+            }
+            this.archivoFuente.setListaRestriccionCollection(listaRestriccionCollection);
+            this.archivoFuente.setIdArchivoFuente(idArchivo);
+        } catch (ParserConfigurationException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SisgriException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+         
+    } 
+    
+        /**
+     * Metodo que permite recorrer el xml de OFAC
+     * 
+     * @param fechaActual 
+     */
+    private void recorrerArchivoExterno(Calendar fechaActual){
+        LOGGER.info("LOGGER :: recorrerArchivoFuente :: recorrerArchivoExterno");
+        ListaRestriccion  listaRestriccion = null;
+        List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
+        Calendar fechaReporte = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {  
+            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            DataInputStream entrada = new DataInputStream(this.uploadedFile.getInputstream());
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(entrada));
+            String strLinea;
+            int sigIdLista = 0;
+            fechaReporte = Calendar.getInstance();  
+            while ((strLinea = buffer.readLine()) != null)   {
+                System.out.println (strLinea);
+                listaRestriccion = new ListaRestriccion();
+                listaRestriccion.setListaRestriccionPK(new ListaRestriccionPK());
+                String[] campo = strLinea.split(ConstantesSisgri.SEPARADOR_ARCH_TEXTO);
+                listaRestriccion.getListaRestriccionPK().setListaIdRegistro(sigIdLista);
+                listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                listaRestriccion.setListaPrimerNombre(campo[0]);
+                listaRestriccion.setListaUltimoNombre(campo[1]);
+                fechaReporte.setTime(sdf.parse(campo[2]));
+                listaRestriccion.setListaFechaReporte(fechaReporte.getTime());
+                listaRestriccion.setListaObservacion(campo[3]);
+                listaRestriccionCollection.add(listaRestriccion); 
+                sigIdLista = sigIdLista + 1;
+            }
+            entrada.close();
+            this.archivoFuente.setListaRestriccionCollection(listaRestriccionCollection);
+            this.archivoFuente.setIdArchivoFuente(idArchivo);
+        }catch (Exception e){ //Catch de excepciones
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, e);
+        }                 
+    } 
+    
+    
     /**
      * Metodo que permite almacenar el archivo en la base de datos
      */
     public void procesarArchivo(){
         LOGGER.info("LOGGER :: CargaArchivoController :: procesarArchivo");  
-        Calendar fechaActual = Calendar.getInstance();          
-        Usuario usuario =  (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
+        Calendar fechaActual = Calendar.getInstance();                  
         fechaActual.get(Calendar.YEAR);
         fechaActual.get(Calendar.MONTH);
         fechaActual.get(Calendar.DAY_OF_MONTH); 
-        try{                        
+        try{
+            this.archivoFuente.setUsuario(this.usuario);
             this.archivoFuente.setFechaCarga(fechaActual.getTime());
             this.archivoFuente.setFechaCreacion(fechaActual.getTime());
-            this.archivoFuente.setFechaModificacion(fechaActual.getTime());            
-            this.archivoFuente.setUsuario(usuario);
-            this.archivoFuente.setUsuarioCreacion(usuario.getNombreUsuario());
-            this.archivoFuente.setUsuarioModificacion(usuario.getNombreUsuario());
+            this.archivoFuente.setFechaModificacion(fechaActual.getTime());                        
+            this.archivoFuente.setUsuarioCreacion(this.usuario.getNombreUsuario());
+            this.archivoFuente.setUsuarioModificacion(this.usuario.getNombreUsuario());  
+            if(this.archivoFuente.getNombreFuente().equals(ConstantesSisgri.FUENTE_OFAC)){
+                this.recorrerArchivoFuenteOFAC(fechaActual);
+            }else if(this.archivoFuente.getNombreFuente().equals(ConstantesSisgri.FUENTE_ONU)){
+                this.recorrerArchivoFuenteONU(fechaActual);
+            }else{
+                this.recorrerArchivoExterno(fechaActual);
+            }
             this.EJBArchivo.guardarArchivo(this.archivoFuente);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,this.mensajes.getString(ConstantesSisgri.MSJ_GUARDA_ARCHIVO_OK), null));
         }catch (SisgriException ex) {
@@ -203,4 +429,21 @@ public class CargaArchivoController implements Serializable{
     public void setOcultarBoton(boolean ocultarBoton) {
         this.ocultarBoton = ocultarBoton;
     }
+    
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+    
 }

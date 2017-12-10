@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
@@ -40,17 +39,15 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
     
     @PersistenceContext(unitName = "sisgriPU")
     private EntityManager em;
-    private EntityManagerFactory emf;
+
 
     @Override
-    protected EntityManager getEntityManager() {
-        return em;
+    protected EntityManager getEntityManager() {        
+        return Persistence.createEntityManagerFactory("sisgriPU").createEntityManager();
     }
     
     public ArchivoFacade() {
         super(Catalogo.class);
-        this.emf = Persistence.createEntityManagerFactory("sisgriPU");
-        this.em = emf.createEntityManager();
     }
     
     /**
@@ -62,14 +59,28 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
     @Transactional
      public void guardarArchivo(ArchivoFuente pArchivoFuente) throws SisgriException{             
         LOGGER.info("LOGGER :: ArchivoFacade :: guardarArchivo");
-        try{
-            pArchivoFuente.setIdArchivoFuente(obtnerIdSigArchivo()); 
+        try{ 
+            this.em = this.getEntityManager();
             this.em.getTransaction().begin();
-            this.em.persist(pArchivoFuente);  
-            this.em.getTransaction().commit();
+            this.borrarArchivoRestriccion(pArchivoFuente.getNombreFuente());
+            this.em.persist(pArchivoFuente);              
+            this.em.getTransaction().commit(); 
+            this.em.close();
         }catch(Exception e){
             throw new SisgriException(e.getMessage());
         }
+    }
+     
+    public void borrarArchivoRestriccion(String pNombreFuente) throws SisgriException{             
+        LOGGER.info("LOGGER :: ArchivoFacade :: borrarArchivoRestriccion");
+        String consulta; 
+        try{     
+            consulta = " DELETE l.* FROM tb_lista_restriccion l, tb_archivo_fuente  a WHERE a.id_archivo_fuente = l.tb_archivo_fuente_id_archivo_fuente AND a.nombre_fuente LIKE '%" + pNombreFuente + "%'";
+            Query q = this.em.createNativeQuery(consulta);     
+            q.executeUpdate();            
+        }catch(NoResultException e) {
+            throw new SisgriException(e.getMessage());            
+        }              
     }
      
      /**
@@ -77,12 +88,13 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
       * @return
       * @throws SisgriException 
       */
+     @Override
      public Integer obtnerIdSigArchivo () throws SisgriException{
         Integer sigIdArchivo =  null;      
         String consulta;        
         try{     
             consulta = "SELECT MAX(a.id_archivo_fuente) FROM tb_archivo_fuente a " ;
-            Query q = em.createNativeQuery(consulta);     
+            Query q = this.getEntityManager().createNativeQuery(consulta);     
             sigIdArchivo = (Integer) q.getSingleResult();
             if(sigIdArchivo == null){
                sigIdArchivo = 0;
@@ -124,11 +136,11 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
                 }
                 consulta = "SELECT DISTINCT l FROM ListaRestriccion l  WHERE " + condicion;                     
             }            
-            Query q = this.em.createQuery(consulta);          
+            Query q = this.getEntityManager().createQuery(consulta);          
             listaClienteCoincide = q.getResultList();
         }catch(Exception e){
             throw new SisgriException(e.getMessage());  
-        }        
+        }       
         return listaClienteCoincide;
      }
     
@@ -142,10 +154,11 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
      public void guardarArchivoCliente(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException{             
         LOGGER.info("LOGGER :: ArchivoFacade :: guardarArchivo");
         try{
+            EntityManager em = this.getEntityManager();
             parchivoClienteMasivo.setIdArchivoCliMasivo(obtnerIdSigArchivoCliente()); 
-            this.em.getTransaction().begin();
-            this.em.persist(parchivoClienteMasivo);  
-            this.em.getTransaction().commit();
+            em.getTransaction().begin();
+            em.persist(parchivoClienteMasivo);  
+            em.getTransaction().commit();         
         }catch(Exception e){
             throw new SisgriException(e.getMessage());
         }
@@ -161,7 +174,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         String consulta;        
         try{     
             consulta = "SELECT MAX(a.id_archivo_cli_masivo) FROM tb_archivo_cliente_masivo a " ;
-            Query q = this.em.createNativeQuery(consulta);     
+            Query q = this.getEntityManager().createNativeQuery(consulta);     
             sigIdArchivoCliente = (Integer) q.getSingleResult();
             if(sigIdArchivoCliente == null){
                sigIdArchivoCliente = 0;
@@ -184,7 +197,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         List<ArchivoClienteMasivo> listaArchivoClienteMasivo = new ArrayList();  
         try{
             consulta = "SELECT DISTINCT a FROM ArchivoClienteMasivo a ORDER BY a.fechaCarga";                     
-            Query q = this.em.createQuery(consulta);          
+            Query q = this.getEntityManager().createQuery(consulta);          
             listaArchivoClienteMasivo = q.getResultList();            
         }catch(Exception e){
             throw new SisgriException(e.getMessage());
@@ -193,10 +206,11 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
     }
      
     
-    @Override
+    
+        @Override
     public void cruzarClientes(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException{
         try{           
-            StoredProcedureQuery query = this.em.createStoredProcedureQuery("prc_cruzar_listas_clientes")
+            StoredProcedureQuery query = this.getEntityManager().createStoredProcedureQuery("prc_cruzar_listas_clientes")
                                         .registerStoredProcedureParameter(1, Integer.class, ParameterMode.IN)
                                         .setParameter(1, parchivoClienteMasivo.getIdArchivoCliMasivo());
  
@@ -212,7 +226,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         String consulta; 
         try{
             consulta = "SELECT DISTINCT c FROM CruceClienteLista c WHERE c.idArchivoCliMasivo = :idArchivoCliente ";                                 
-            Query q = this.em.createQuery(consulta);          
+            Query q = this.getEntityManager().createQuery(consulta);          
             q.setParameter("idArchivoCliente", parchivoClienteMasivo.getIdArchivoCliMasivo());
             listaCruceClienteLista = q.getResultList();  
         }catch(Exception e){
@@ -221,10 +235,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         return listaCruceClienteLista;
     }
         
-    /*
-     Metodos SET y GET
-     */ 
-          
+    
     public EntityManager getEm() {
         return em;
     }
@@ -233,11 +244,4 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         this.em = em;
     }
     
-        public EntityManagerFactory getEmf() {
-        return emf;
-    }
-
-    public void setEmf(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
 }
