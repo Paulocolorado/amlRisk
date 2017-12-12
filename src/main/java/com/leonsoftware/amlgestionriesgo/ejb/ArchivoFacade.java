@@ -111,33 +111,47 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
     /**
      * metodo que permite buscar las coincidencias por criterio
      * @param parametros
+     * @param pNumeroID
      * @return
      * @throws SisgriException 
      */ 
     @Override   
      public List<ListaRestriccion> buscarListaCoincidencia(String[] parametros, String pNumeroID) throws SisgriException{         
-        String consulta; 
+        String consulta = null; 
         boolean bandera = ConstantesSisgri.FALSO;
         String condicion = ConstantesSisgri.ESPACIO_BLANCO;
+        String operadorY = ConstantesSisgri.OPERADOR_Y;
+        String donde = ConstantesSisgri.ESPACIO_BLANCO;
         List<ListaRestriccion> listaClienteCoincide = new ArrayList();         
         try{
             this.em.getEntityManagerFactory().getCache().evictAll();
-            if(!pNumeroID.equals(ConstantesSisgri.VACIO)){
-                consulta = " SELECT DISTINCT l FROM ListaRestriccion l, ListaIdRestriccion id  WHERE "+
-                           " l.listaRestriccionPK.listaIdRegistro = id.listaIdRestriccionPK.tbListaRestriccionListaIdRegistro AND " +
-                           " l.listaRestriccionPK.tbArchivoFuenteIdArchivoFuente = id.listaIdRestriccionPK.tbArchivoFuenteIdArchivoFuente AND " +
-                           " id.numeroId LIKE trim(lower('%" + pNumeroID + "%')) ";                     
-            }else{
+            
+            consulta = " SELECT DISTINCT l FROM ListaRestriccion l, ListaIdRestriccion id  WHERE "+
+                       " l.listaRestriccionPK.listaIdRegistro = id.listaIdRestriccionPK.tbListaRestriccionListaIdRegistro AND " +
+                       " l.listaRestriccionPK.tbArchivoFuenteIdArchivoFuente = id.listaIdRestriccionPK.tbArchivoFuenteIdArchivoFuente ";               
+            
+            if((parametros.length > 0 )){
                 for (String parametro : parametros) {
-                    if(bandera){
+                    if(!parametro.equals(ConstantesSisgri.VACIO)){
+                        if(bandera){
+                            condicion = condicion + " OR ";
+                        }                    
+                        condicion = condicion + " trim(lower(l.listaPrimerNombre)) LIKE trim(lower('%" + parametro + "%')) OR " 
+                                                  + " trim(lower(l.listaUltimoNombre)) LIKE trim(lower('%" + parametro + "%')) ";                
+                        bandera = ConstantesSisgri.VERDADERO;
+                    }    
+                }                  
+            }
+            if(!pNumeroID.equals(ConstantesSisgri.VACIO)){
+                if(bandera){
                         condicion = condicion + " OR ";
-                    }
-                    condicion = condicion + " trim(lower(l.listaPrimerNombre)) LIKE trim(lower('%" + parametro + "%')) OR " 
-                                          + " trim(lower(l.listaUltimoNombre)) LIKE trim(lower('%" + parametro + "%')) ";                
-                    bandera = ConstantesSisgri.VERDADERO;
                 }
-                consulta = "SELECT DISTINCT l FROM ListaRestriccion l  WHERE " + condicion;                     
-            }            
+                condicion = condicion.concat(" id.numeroId LIKE trim(lower('%" + pNumeroID + "%'))");   
+            }
+            if(!condicion.equals(ConstantesSisgri.ESPACIO_BLANCO)){
+                donde = donde.concat(operadorY);
+            }
+            consulta = consulta.concat(donde).concat(" (").concat(condicion).concat(") ");                     
             Query q = this.em.createQuery(consulta);          
             listaClienteCoincide = q.getResultList();           
         }catch(Exception e){
@@ -157,6 +171,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         LOGGER.info("LOGGER :: ArchivoFacade :: guardarArchivo");
         EntityTransaction tx = em.getTransaction();
         try{
+            this.em.getEntityManagerFactory().getCache().evictAll();
             tx.begin();
             parchivoClienteMasivo.setIdArchivoCliMasivo(obtnerIdSigArchivoCliente());             
             this.em.persist(parchivoClienteMasivo);              
@@ -198,6 +213,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         String consulta; 
         List<ArchivoClienteMasivo> listaArchivoClienteMasivo = new ArrayList();  
         try{
+            this.em.getEntityManagerFactory().getCache().evictAll();
             consulta = "SELECT DISTINCT a FROM ArchivoClienteMasivo a ORDER BY a.fechaCarga";                     
             Query q = this.em.createQuery(consulta);          
             listaArchivoClienteMasivo = q.getResultList();            

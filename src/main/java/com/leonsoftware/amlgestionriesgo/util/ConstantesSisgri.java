@@ -34,6 +34,7 @@ public class ConstantesSisgri {
     public static final String FUENTE_ONU = "ONU";
     public static final String FUENTE_EXTERNA = "EXTERNA";
     public static final String SEPARADOR_ARCH_TEXTO = ",";
+    public static final String OPERADOR_Y = "AND";
     
     
 }
