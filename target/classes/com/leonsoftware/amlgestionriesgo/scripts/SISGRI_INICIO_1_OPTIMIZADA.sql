@@ -1,3 +1,4 @@
+drop table `tb_usuario`;
 CREATE TABLE `tb_usuario` (
   `tipo_id_usuario` varchar(3) NOT NULL COMMENT 'tipo de identificaciòn de usuario',
   `id_usuario` int(11) NOT NULL COMMENT 'identificacion del usuario',
@@ -14,11 +15,13 @@ CREATE TABLE `tb_usuario` (
   UNIQUE KEY `usuario_UNIQUE` (`usuario`,`tipo_id_usuario`,`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla para el manejo de usuarios del Sistema SISGRI';
 
+drop table `tb_trazabilidad`;
 CREATE TABLE `tb_trazabilidad` (
   `fecha_trazabilidad` datetime NOT NULL,
   `valor_trazabilidad` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+drop table `tb_catalogo`;
 CREATE TABLE `tb_catalogo` (
   `id_catalogo` varchar(50) NOT NULL COMMENT 'codigo para recuperar lista',
   `fecha_creacion` datetime DEFAULT NULL COMMENT 'auditoria - fecha de creaciòn del registro',
@@ -28,7 +31,7 @@ CREATE TABLE `tb_catalogo` (
   PRIMARY KEY (`id_catalogo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla para el manejo de catalogos de la aplicación';
 
-
+drop table `tb_lista_catalogo`;
 CREATE TABLE `tb_lista_catalogo` (
   `nombre_lista_catalogo` varchar(50) NOT NULL,
   `valor_lista_catalogo` varchar(50) NOT NULL,
@@ -42,6 +45,7 @@ CREATE TABLE `tb_lista_catalogo` (
   CONSTRAINT `fk_tb_lista_catalogo_tb_catalogo1` FOREIGN KEY (`tb_catalogo_id_catalogo`) REFERENCES `tb_catalogo` (`id_catalogo`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='tabla que almacena los registros individuales de cada catalo';
 
+drop table `tb_archivo_cliente_masivo`;
 CREATE TABLE `tb_archivo_cliente_masivo` (
   `id_archivo_cli_masivo` int(11) NOT NULL COMMENT 'identificador interno de archivo',
   `nombre_archivo_cli_masivo` varchar(100) NOT NULL COMMENT 'nombre del archivo',
@@ -60,6 +64,7 @@ CREATE TABLE `tb_archivo_cliente_masivo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+drop table `tb_archivo_fuente`;
 CREATE TABLE `tb_archivo_fuente` (
   `id_archivo_fuente` int(11) NOT NULL COMMENT 'identificador interno de archivo',
   `nombre_archivo_fuente` varchar(100) NOT NULL COMMENT 'nombre del archivo',
@@ -79,6 +84,7 @@ CREATE TABLE `tb_archivo_fuente` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+drop table `tb_cliente_masivo`;
 CREATE TABLE `tb_cliente_masivo` (
   `tipo_id_cliente` varchar(15) NOT NULL COMMENT 'Tipo de identificacion del cliente a verificar relacionado con la lista FUENTE_RIESGO',
   `id_cliente` varchar(45) NOT NULL COMMENT 'Identificacion del cliente',
@@ -94,6 +100,7 @@ CREATE TABLE `tb_cliente_masivo` (
   CONSTRAINT `fk_tb_cliente_masivo_tb_archivo_cliente_masivo1` FOREIGN KEY (`id_archivo_cli_masivo`) REFERENCES `tb_archivo_cliente_masivo` (`id_archivo_cli_masivo`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+drop table `tb_cruce_cliente_lista`;
 CREATE TABLE `tb_cruce_cliente_lista` (
   `id_registro` int(11) NOT NULL,
   `id_cliente` varchar(45) NOT NULL,
@@ -113,6 +120,7 @@ CREATE TABLE `tb_cruce_cliente_lista` (
   KEY `idx_id_cliente` (`id_cliente`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla que permite almacenar la relacion existente';
 
+drop table `tb_lista_restriccion`;
 CREATE TABLE `tb_lista_restriccion` (
   `lista_id_registro` double NOT NULL COMMENT 'Onu: DATAID\nOfac: uid',
   `lista_primer_nombre` varchar(500) DEFAULT NULL COMMENT 'Onu: FIRST_NAME\nOfac: firstName',
@@ -130,6 +138,7 @@ CREATE TABLE `tb_lista_restriccion` (
   CONSTRAINT `fk_archivo_fuente_lista` FOREIGN KEY (`tb_archivo_fuente_id_archivo_fuente`) REFERENCES `tb_archivo_fuente` (`id_archivo_fuente`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla que mantiene las listas restrictivas';
 
+drop table `tb_lista_id_restriccion`;
 CREATE TABLE `tb_lista_id_restriccion` (
   `lista_id_restriccion_id` double NOT NULL,
   `tipo_id` varchar(500) DEFAULT NULL,
@@ -170,6 +179,7 @@ INSERT INTO `tb_lista_catalogo` (`nombre_lista_catalogo`,`valor_lista_catalogo`,
 /*******************/
 
 DELIMITER $$
+drop function `fnc_obtenerEtiqueta`;
 CREATE FUNCTION `fnc_obtenerEtiqueta`(pfuente varchar(50), pParametro varchar(50)) RETURNS varchar(50) CHARSET utf8
 BEGIN
 DECLARE  nomEtiqueta varchar(50)  DEFAULT ' ';
@@ -189,6 +199,7 @@ DELIMITER ;
 /***************/
 
 DELIMITER $$
+drop function `fnc_obtenerNumEtiqueta`;
 CREATE FUNCTION `fnc_obtenerNumEtiqueta`(pfuente varchar(50)) RETURNS int(11)
 BEGIN
 DECLARE  numEtiqueta INT DEFAULT 1;
@@ -208,8 +219,8 @@ DELIMITER ;
 
 DELIMITER $$
 
-DROP TRIGGER IF EXISTS bd_sisgri.tb_archivo_cliente_masivo_AFTER_INSERT$$
 USE `bd_sisgri`$$
+DROP TRIGGER IF EXISTS bd_sisgri.tb_archivo_cliente_masivo_AFTER_INSERT
 CREATE TRIGGER `bd_sisgri`.`tb_archivo_cliente_masivo_AFTER_INSERT` AFTER INSERT ON `tb_archivo_cliente_masivo` FOR EACH ROW
 BEGIN
 
@@ -274,8 +285,8 @@ DELIMITER $$
 /*************************/
 
 DELIMITER $$
+USE `bd_sisgri`
 DROP procedure IF EXISTS `prc_cruzar_listas_clientes`;
-USE `bd_sisgri`$$
 CREATE PROCEDURE `prc_cruzar_listas_clientes`(IN idArchivoCliente INT)
 BEGIN    
 
