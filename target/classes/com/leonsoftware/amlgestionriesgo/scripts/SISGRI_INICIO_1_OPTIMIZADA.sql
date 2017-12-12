@@ -60,23 +60,6 @@ CREATE TABLE `tb_archivo_cliente_masivo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `tb_archivo_cliente_masivo` (
-  `id_archivo_cli_masivo` int(11) NOT NULL COMMENT 'identificador interno de archivo',
-  `nombre_archivo_cli_masivo` varchar(100) NOT NULL COMMENT 'nombre del archivo',
-  `fecha_carga` datetime DEFAULT NULL COMMENT 'fecha por defecto del sistema al cargar el archivo',
-  `archivo_cargado` longblob NOT NULL,
-  `fecha_creacion` datetime DEFAULT NULL COMMENT 'auditoria - fecha de creaciòn del registro ',
-  `procesado` varchar(2) NOT NULL,
-  `usuario_creacion` varchar(15) DEFAULT NULL COMMENT 'auditoria - usuario de creaciòn del registro ',
-  `fecha_modificacion` datetime DEFAULT NULL COMMENT 'auditoria - fecha de modificaciòn del registro ',
-  `usuario_modificacion` varchar(15) DEFAULT NULL COMMENT 'auditoria - usuario de modificaciòn del registro ',
-  `tb_usuario_id_usuario` int(11) NOT NULL,
-  `tb_usuario_tipo_id_usuario` varchar(3) NOT NULL,
-  PRIMARY KEY (`id_archivo_cli_masivo`),
-  KEY `fk_tb_archivo_fuente_tb_usuario1_idx` (`tb_usuario_id_usuario`,`tb_usuario_tipo_id_usuario`),
-  CONSTRAINT `fk_tb_archivo_cliente_masivo_tb_usuario` FOREIGN KEY (`tb_usuario_id_usuario`, `tb_usuario_tipo_id_usuario`) REFERENCES `tb_usuario` (`id_usuario`, `tipo_id_usuario`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE `tb_archivo_fuente` (
   `id_archivo_fuente` int(11) NOT NULL COMMENT 'identificador interno de archivo',
   `nombre_archivo_fuente` varchar(100) NOT NULL COMMENT 'nombre del archivo',

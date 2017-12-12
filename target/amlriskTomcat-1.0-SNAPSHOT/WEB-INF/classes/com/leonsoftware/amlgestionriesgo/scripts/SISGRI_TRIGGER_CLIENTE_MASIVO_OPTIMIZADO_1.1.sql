@@ -7,6 +7,9 @@ Ajuste a trigger solucionando defecto de carga de clientes para cruce masivo
 USE BD_SISGRI;
 
 DELIMITER $$
+
+DROP TRIGGER `bd_sisgri`.`tb_archivo_cliente_masivo_AFTER_INSERT`
+
 CREATE TRIGGER `bd_sisgri`.`tb_archivo_cliente_masivo_AFTER_INSERT` AFTER INSERT ON `tb_archivo_cliente_masivo` FOR EACH ROW
 BEGIN
 
