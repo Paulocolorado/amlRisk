@@ -242,9 +242,10 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         List<CruceClienteLista>  listaCruceClienteLista = new ArrayList<CruceClienteLista>();
         String consulta; 
         try{
-            consulta = "SELECT DISTINCT c FROM CruceClienteLista c WHERE c.idArchivoCliMasivo = :idArchivoCliente ";                                 
+            consulta = "SELECT DISTINCT c FROM CruceClienteLista c WHERE c.idArchivoCliMasivo = :idArchivoCliente AND c.porcentaje >= :porcentaje50";                                 
             Query q = this.em.createQuery(consulta);          
             q.setParameter("idArchivoCliente", parchivoClienteMasivo.getIdArchivoCliMasivo());
+            q.setParameter("porcentaje50", ConstantesSisgri.PORCENTAJE_CINCUENTA);
             listaCruceClienteLista = q.getResultList();  
         }catch(Exception e){
             throw new SisgriException(e.getMessage());

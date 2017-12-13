@@ -87,8 +87,10 @@ public class ConsultaListaController implements Serializable{
                             porcentanjeAux = porcentanjeAux + porcPorPalabra;
                         }
                     }
-                }    
-            listaRestriccion.setPorcentaje(porcentanjeAux);            
+                }  
+            if(porcentanjeAux >= ConstantesSisgri.PORCENTAJE_CINCUENTA){    
+                listaRestriccion.setPorcentaje(porcentanjeAux);            
+            }    
             }
         } catch (SisgriException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.getMensajes().getString(ConstantesSisgri.MSJ_ERROR_CONSULTA), ex.getMessage()));
