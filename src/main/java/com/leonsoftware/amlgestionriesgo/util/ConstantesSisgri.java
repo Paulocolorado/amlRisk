@@ -36,5 +36,7 @@ public class ConstantesSisgri {
     public static final String SEPARADOR_ARCH_TEXTO = ",";
     public static final String OPERADOR_Y = "AND";
     
+    public static final String MENU_SUBMENU = "S";
+    public static final String MENU_ITEM = "I";
     
 }

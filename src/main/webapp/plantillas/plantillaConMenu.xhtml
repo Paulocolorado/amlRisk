@@ -18,7 +18,10 @@
 
        <div id="top" align="center">
             <ui:insert name="top">
-                <h1>#{msj.tituloSistema}</h1>               
+                <h1>#{msj.tituloSistema}</h1> 
+                <div id="cerrarSesion" align="right">
+                    <p:commandButton actionListener="#{plantillaConMenuController.cerrarSesion}" value="#{msj.salir}" action="autenticacion.xhtml"/>                        
+                </div>    
             </ui:insert>           
         </div>
         
@@ -26,18 +29,7 @@
             <div id="left">                
                 <ui:insert name="left">
                     <h:form id="frmMenuPrincipal">
-                        <p:menubar>
-                            <p:menuitem value="#{msj.mnuCargaFuente}" action="/cargaFuentes/cargaFuente" />
-                            <p:separator />
-                            <p:menuitem value="#{msj.mnuConsultaLista}" action="/consultaListas/consultaParticularLista" />
-                            <p:separator />
-                            <p:submenu label="#{msj.mnuCruceCliente}">
-                                <p:menuitem value="#{msj.subMnuCargaLista}" action="/cargaFuentes/cruceMasivoLista"  />
-                                <p:menuitem value="#{msj.subMnuConsultaLista}" action="/consultaListas/consultaMasivoLista"  />
-                            </p:submenu>
-                            <p:separator />
-                            <p:menuitem value="#{msj.salir}" action="#{autenticacionController.loggout()}" />
-                        </p:menubar>
+                        <p:menubar model="#{plantillaConMenuController.model}" />                                                   
                     </h:form> 
                 </ui:insert>
             </div>            

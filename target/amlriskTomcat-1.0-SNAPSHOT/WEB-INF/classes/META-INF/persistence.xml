@@ -3,6 +3,8 @@
   <persistence-unit name="sisgriPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.leonsoftware.amlgestionriesgo.model.CruceClienteLista</class>
+    <class>com.leonsoftware.amlgestionriesgo.model.Menu</class>
+    <class>com.leonsoftware.amlgestionriesgo.model.ListaIdRestriccion</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <class>com.leonsoftware.amlgestionriesgo.model.Usuario</class>
     <class>com.leonsoftware.amlgestionriesgo.model.ArchivoFuente</class>

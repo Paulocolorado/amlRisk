@@ -4,12 +4,10 @@ Ajuste a trigger solucionando defecto de carga de clientes para cruce masivo
 11/12/2017
 */
 
-USE BD_SISGRI;
+USE bd_sisgri;
 
 DELIMITER $$
-
-DROP TRIGGER `bd_sisgri`.`tb_archivo_cliente_masivo_AFTER_INSERT`
-
+DROP TRIGGER `bd_sisgri`.`tb_archivo_cliente_masivo_AFTER_INSERT`;
 CREATE TRIGGER `bd_sisgri`.`tb_archivo_cliente_masivo_AFTER_INSERT` AFTER INSERT ON `tb_archivo_cliente_masivo` FOR EACH ROW
 BEGIN
 
@@ -18,7 +16,7 @@ DECLARE linea TEXT DEFAULT NULL;
 DECLARE longitud double DEFAULT 1;
 DECLARE posicion double DEFAULT 1;
 DECLARE num_reg INT UNSIGNED;
-DECLARE CONST_FINAL_LIN TEXT DEFAULT '\n';
+DECLARE CONST_FINAL_LIN TEXT DEFAULT '*';
 DECLARE CONST_NOM_CATALOGO TEXT DEFAULT 'TXT_CLIENTE';
 DECLARE separador TEXT DEFAULT 'separador';
 DECLARE archivoAux longblob;
@@ -39,7 +37,7 @@ set archivoAux := NEW.archivo_cargado;
 		
 
 
-/*Auditoria
+/*Auditoria 
 INSERT INTO tb_trazabilidad (fecha_trazabilidad, valor_trazabilidad) values
 (now(), concat('longitud:',longitud,'linea:',linea,'-posicion:',posicion,'archivoAux',archivoAux));
  */
@@ -58,7 +56,7 @@ INSERT INTO tb_trazabilidad (fecha_trazabilidad, valor_trazabilidad) values
 		(SUBSTRING_INDEX(linea,separador,1),
 		SUBSTRING_INDEX(SUBSTRING_INDEX(linea,separador,2),separador,-1), 
 		SUBSTRING_INDEX(SUBSTRING_INDEX(linea,separador,-2),separador,1), 
-        SUBSTRING_INDEX(linea,separador,-1),
+        REPLACE (SUBSTRING_INDEX(linea,separador,-1),CONST_FINAL_LIN,''),
 		now(),
 		NEW.usuario_creacion,
 		now(),
