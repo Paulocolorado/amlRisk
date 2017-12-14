@@ -119,13 +119,13 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         String consulta = null; 
         boolean bandera = ConstantesSisgri.FALSO;
         String condicion = ConstantesSisgri.ESPACIO_BLANCO;
-        String operadorY = ConstantesSisgri.OPERADOR_Y;
+        String operadorY = ConstantesSisgri.OPERADOR_DONDE;
         String donde = ConstantesSisgri.ESPACIO_BLANCO;
         List<ListaRestriccion> listaClienteCoincide = new ArrayList();         
         try{
             this.em.getEntityManagerFactory().getCache().evictAll();
             
-            consulta = " SELECT DISTINCT l FROM ListaRestriccion l, ListaIdRestriccion id  WHERE "+
+            consulta = " SELECT DISTINCT l FROM ListaRestriccion l LEFT JOIN ListaIdRestriccion id  ON "+
                        " l.listaRestriccionPK.listaIdRegistro = id.listaIdRestriccionPK.tbListaRestriccionListaIdRegistro AND " +
                        " l.listaRestriccionPK.tbArchivoFuenteIdArchivoFuente = id.listaIdRestriccionPK.tbArchivoFuenteIdArchivoFuente ";               
             

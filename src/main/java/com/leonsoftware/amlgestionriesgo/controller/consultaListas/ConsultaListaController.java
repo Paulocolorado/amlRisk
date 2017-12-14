@@ -79,7 +79,7 @@ public class ConsultaListaController implements Serializable{
             this.listaClienteCoincide = (List<ListaRestriccion>) this.EJBArchivo.buscarListaCoincidencia(parametros, this.numeroID.trim());            
             for(ListaRestriccion  listaRestriccion : this.listaClienteCoincide){
                 porcentanjeAux = new Double(0);
-                if(!this.numeroID.isEmpty()){
+                if(!this.numeroID.equals(ConstantesSisgri.VACIO)){
                     porcentanjeAux = ConstantesSisgri.PORCENTAJE_CIEN;
                 }else{    
                     for(String parametro : parametros){
