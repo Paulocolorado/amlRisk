@@ -63,9 +63,10 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         LOGGER.info("LOGGER :: ArchivoFacade :: guardarArchivo");
         EntityTransaction tx = em.getTransaction();
         try{  
-           tx.begin();
+            tx.begin();            
+            this.em.getEntityManagerFactory().getCache().evictAll();
             this.borrarArchivoRestriccion(pArchivoFuente.getNombreFuente());
-            this.em.persist(pArchivoFuente);              
+            this.em.persist(pArchivoFuente);            
             tx.commit();            
         }catch(Exception e){
             throw new SisgriException(e.getMessage());
@@ -93,7 +94,8 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
      public Integer obtnerIdSigArchivo () throws SisgriException{
         Integer sigIdArchivo =  null;      
         String consulta;        
-        try{     
+        try{   
+            this.em.getEntityManagerFactory().getCache().evictAll();
             consulta = "SELECT MAX(a.id_archivo_fuente) FROM tb_archivo_fuente a " ;
             Query q = this.getEntityManager().createNativeQuery(consulta);     
             sigIdArchivo = (Integer) q.getSingleResult();
@@ -189,6 +191,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         Integer sigIdArchivoCliente =  null;      
         String consulta;        
         try{     
+            this.em.getEntityManagerFactory().getCache().evictAll();
             consulta = "SELECT MAX(a.id_archivo_cli_masivo) FROM tb_archivo_cliente_masivo a " ;
             Query q = this.em.createNativeQuery(consulta);     
             sigIdArchivoCliente = (Integer) q.getSingleResult();

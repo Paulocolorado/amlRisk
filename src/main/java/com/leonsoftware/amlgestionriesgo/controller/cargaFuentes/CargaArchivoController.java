@@ -357,6 +357,7 @@ public class CargaArchivoController implements Serializable{
                 this.recorrerArchivoExterno(fechaActual);
             }
             this.EJBArchivo.guardarArchivo(this.archivoFuente);
+            init();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,this.mensajes.getString(ConstantesSisgri.MSJ_GUARDA_ARCHIVO_OK), null));
         }catch (SisgriException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_GUARDA_ARCHIVO), ex.getMessage()));
