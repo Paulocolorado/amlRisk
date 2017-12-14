@@ -7,6 +7,7 @@ package com.leonsoftware.amlgestionriesgo.ejb;
 
 import com.leonsoftware.amlgestionriesgo.exception.SisgriException;
 import com.leonsoftware.amlgestionriesgo.model.Usuario;
+import java.io.Serializable;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -15,7 +16,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 @Stateless
-public class UsuarioFacadeLocalImpl extends AbstractFacade<Usuario> implements UsuarioFacadeLocal {
+public class UsuarioFacadeLocalImpl extends AbstractFacade<Usuario> implements UsuarioFacadeLocal, Serializable {
     
     private EntityManager em;
     private EntityManagerFactory emf;
