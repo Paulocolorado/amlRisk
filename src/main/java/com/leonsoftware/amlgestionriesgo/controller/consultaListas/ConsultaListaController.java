@@ -76,21 +76,19 @@ public class ConsultaListaController implements Serializable{
         Double porcPorPalabra = (ConstantesSisgri.PORCENTAJE_CIEN / parametros.length);
         Double porcentanjeAux;
         try {
-            this.listaClienteCoincide = (List<ListaRestriccion>) this.EJBArchivo.buscarListaCoincidencia(parametros, this.numeroID.trim());            
-            for(ListaRestriccion  listaRestriccion : this.listaClienteCoincide){
-                porcentanjeAux = new Double(0);
-                if(!this.numeroID.equals(ConstantesSisgri.VACIO)){
-                    porcentanjeAux = ConstantesSisgri.PORCENTAJE_CIEN;
-                }else{    
-                    for(String parametro : parametros){
-                        if ((listaRestriccion.getListaPrimerNombre() == null ? ConstantesSisgri.ESPACIO_BLANCO : listaRestriccion.getListaPrimerNombre().toLowerCase()).concat((listaRestriccion.getListaUltimoNombre()== null ? ConstantesSisgri.ESPACIO_BLANCO : listaRestriccion.getListaUltimoNombre().toLowerCase())).contains(parametro.toLowerCase())){
-                            porcentanjeAux = porcentanjeAux + porcPorPalabra;
-                        }
+            List<ListaRestriccion> listaClienteCoincideAux = (List<ListaRestriccion>) this.EJBArchivo.buscarListaCoincidencia(parametros, this.numeroID.trim());            
+            for(ListaRestriccion  listaRestriccion : listaClienteCoincideAux){
+                porcentanjeAux = new Double(0);                
+                for(String parametro : parametros){
+                    if (((listaRestriccion.getListaPrimerNombre() == null ? ConstantesSisgri.ESPACIO_BLANCO : listaRestriccion.getListaPrimerNombre().toLowerCase()).concat((listaRestriccion.getListaUltimoNombre()== null ? ConstantesSisgri.ESPACIO_BLANCO : listaRestriccion.getListaUltimoNombre().toLowerCase())).contains(parametro.toLowerCase())) || (!this.numeroID.equals(ConstantesSisgri.VACIO) && (listaRestriccion.getIdCompleta().contains(this.numeroID))))  {
+                        porcentanjeAux = porcentanjeAux + porcPorPalabra;
                     }
-                }  
-            if(porcentanjeAux >= ConstantesSisgri.PORCENTAJE_CINCUENTA){    
-                listaRestriccion.setPorcentaje(porcentanjeAux);            
-            }    
+                }
+                if(porcentanjeAux >= ConstantesSisgri.PORCENTAJE_CINCUENTA){
+                    listaRestriccion.setPorcentaje(porcentanjeAux); 
+                    this.listaClienteCoincide.add(listaRestriccion);
+                }
+
             }
         } catch (SisgriException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.getMensajes().getString(ConstantesSisgri.MSJ_ERROR_CONSULTA), ex.getMessage()));

@@ -39,7 +39,7 @@
                             <p:panel id="pnlResultadoConsultaLista" header="#{msj.resultadoConsulta}" rendered="#{consultaListaController.visualizaResultado}"> 
                                 <p:dataTable id="dtClienteCoincide" var="clienteCoincide" value="#{consultaListaController.listaClienteCoincide}" paginator="true" rows="10" styleClass="paginated" emptyMessage="#{msj.mensajeNoEncontro}" paginatorPosition="bottom"  >
                                     
-                                    <p:column headerText="#{msj.porcentajeCoincidencia}">
+                                    <p:column headerText="#{msj.porcentajeCoincidencia}" sortBy="#{clienteCoincide.porcentaje}">
                                         <h:outputText value="#{clienteCoincide.porcentaje}%" />
                                     </p:column>
 

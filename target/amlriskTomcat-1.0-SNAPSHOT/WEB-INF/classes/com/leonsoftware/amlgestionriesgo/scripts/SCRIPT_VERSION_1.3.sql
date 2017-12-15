@@ -29,28 +29,19 @@ INSERT INTO `bd_sisgri`.`tb_usuario` (`tipo_id_usuario`, `id_usuario`, `nombre_u
 INSERT INTO `bd_sisgri`.`tb_usuario` (`tipo_id_usuario`, `id_usuario`, `nombre_usuario`, `apellido_usuario`, `usuario`, `clave_usuario`, `correo_usuario`, `fecha_creacion`, `usuario_creacion`, `fecha_modificacion`, `usuario_modificacion`) VALUES ('O', '2', 'OPERARIO1', 'OPR1', 'opr1', '0p3r4r10', 'atencion.cliente@amlrisk.net', '2017-12-12 16:10:26', 'usuSisgri', '2017-12-12 16:10:26', 'usuSisgri');
 
 
-CREATE TABLE `bd_sisgri`.`tb_menu` (
-  `codigo` TINYINT(4) NOT NULL,
-  `nombre_menu` VARCHAR(50) NULL,
-  `url_menu` VARCHAR(45) NULL,
-  `tipo_menu` VARCHAR(5) NULL,
-  `tipo_usuario` VARCHAR(5) NULL,
-  `codigo_submenu` TINYINT(5) NULL,
-  `estado` VARCHAR(45) NULL,
-  PRIMARY KEY (`codigo`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
+CREATE TABLE `tb_menu` (
+  `codigo` tinyint(4) NOT NULL,
+  `nombre_menu` varchar(50) DEFAULT NULL,
+  `url_menu` varchar(45) DEFAULT NULL,
+  `tipo_menu` varchar(5) DEFAULT NULL,
+  `tipo_usuario` varchar(5) DEFAULT NULL,
+  `codigo_submenu` tinyint(5) DEFAULT NULL,
+  `estado` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `fk_menu_submenu_idx` (`codigo_submenu`),
+  CONSTRAINT `fk_menu_submenu` FOREIGN KEY (`codigo_submenu`) REFERENCES `tb_menu` (`codigo`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='tabla que gestiona la funcionalidad del menu dinamico';
 
-ALTER TABLE `bd_sisgri`.`tb_menu` 
-ADD INDEX `fk_menu_submenu_idx` (`codigo_submenu` ASC);
-ALTER TABLE `bd_sisgri`.`tb_menu` 
-ADD CONSTRAINT `fk_menu_submenu`
-  FOREIGN KEY (`codigo_submenu`)
-  REFERENCES `bd_sisgri`.`tb_menu` (`codigo`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-COMMENT = 'tabla que gestiona la funcionalidad del menu dinamico';
 
 INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (1,'Carga de Fuentes','/cargaFuentes/cargaFuente.xhtml','I','A',NULL,'A');
 INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (2,'Consulta de Listas','/consultaListas/consultaParticularLista.xhtml','I','A',NULL,'A');
@@ -58,5 +49,6 @@ INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuar
 INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (4,'Cruce Clientes','','S','A',NULL,'A');
 INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (5,'Carga Archivo Clientes','/cargaFuentes/cruceMasivoLista.xhtml','I','A',4,'A');
 INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (6,'Consulta Clientes','/consultaListas/consultaMasivoLista.xhtml','I','A',4,'A');
-INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (7,'Consulta Clientes','/consultaListas/consultaMasivoLista.xhtml','I','O',8,'A');
-INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (8,'Cruce Clientes',NULL,'S','O',NULL,'A');
+INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (7,'Cruce Clientes',NULL,'S','O',NULL,'A');
+INSERT INTO `tb_menu` (`codigo`,`nombre_menu`,`url_menu`,`tipo_menu`,`tipo_usuario`,`codigo_submenu`,`estado`) VALUES (8,'Consulta Clientes','/consultaListas/consultaMasivoLista.xhtml','I','O',7,'A');
+
