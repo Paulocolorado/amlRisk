@@ -21,14 +21,20 @@ import com.leonsoftware.amlgestionriesgo.util.ConstantesSisgri;
 import com.leonsoftware.amlgestionriesgo.util.UtilitarioLeonSoftware;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -43,6 +49,7 @@ import javax.inject.Named;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import org.primefaces.event.FileUploadEvent;
@@ -73,7 +80,9 @@ public class CargaArchivoController implements Serializable{
     private List<ListaCatalogo> listaFuente;
     private boolean ocultarBoton;
     private Usuario usuario;
-    private UploadedFile uploadedFile;
+    private Path rutaTemporal;
+    private Path archivoTemporal;
+ 
 
     
     /**
@@ -87,6 +96,8 @@ public class CargaArchivoController implements Serializable{
         this.listaFuente = null;
         this.ocultarBoton = true;
         this.usuario = null;
+        this.rutaTemporal = null;
+        this.archivoTemporal = null;
     }
 
     /**
@@ -102,6 +113,7 @@ public class CargaArchivoController implements Serializable{
         this.EJBArchivo = new ArchivoFacade();
         this.ocultarBoton = true;
         this.usuario =  (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
+        this.rutaTemporal = Paths.get(ConstantesSisgri.RUTA_TEMP);        
     }
     
     /**
@@ -122,13 +134,17 @@ public class CargaArchivoController implements Serializable{
      * @param e 
      */
     public void cargarArchivoListener(FileUploadEvent e){
+        LOGGER.info("LOGGER :: CargaArchivoController :: cargarArchivoListener");
         try {
-            LOGGER.info("LOGGER :: CargaArchivoController :: cargarArchivoListener");
-            this.archivoFuente.setNombreArchivoFuente(e.getFile().getFileName());
-            this.archivoFuente.setArchivoCargado(IOUtils.toByteArray(e.getFile().getInputstream()));
-            if(e.getFile() != null) {
-                this.uploadedFile = e.getFile();
+            UploadedFile uploadedFile = e.getFile();             
+            if(uploadedFile != null) {  
+                String filename = FilenameUtils.getName(uploadedFile.getFileName());
+                String extension = FilenameUtils.getExtension(uploadedFile.getFileName());                
+                this.archivoFuente.setNombreArchivoFuente(filename);
+                this.archivoFuente.setArchivoCargado(IOUtils.toByteArray(uploadedFile.getInputstream()));               
                 this.ocultarBoton = false;
+                this.archivoTemporal = Files.createTempFile(this.rutaTemporal, filename + "-", "." + extension);
+                Files.copy(uploadedFile.getInputstream(), this.archivoTemporal, StandardCopyOption.REPLACE_EXISTING);               
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.archivoFuente.getNombreArchivoFuente() + "->" + this.mensajes.getString(ConstantesSisgri.MSJ_CARGA_OK), null));
             }else{
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), null));            
@@ -153,12 +169,12 @@ public class CargaArchivoController implements Serializable{
         List<ListaIdRestriccion> listaIdRestriccionCollection = new ArrayList<ListaIdRestriccion>();
         try {            
             Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder;
-            documentBuilder = dbf.newDocumentBuilder();
-            Document document = documentBuilder.parse(this.uploadedFile.getInputstream());
-            document.getDocumentElement().normalize();
-            NodeList listaNodo = document.getElementsByTagName("sdnEntry");            
+            File inputFile = new File(this.archivoTemporal.toString());
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(inputFile);
+            doc.getDocumentElement().normalize();
+            NodeList listaNodo = doc.getElementsByTagName("sdnEntry");            
             for(int temp = 0; temp < listaNodo.getLength(); temp++){                
                 Node nodo = listaNodo.item(temp);
                 listaRestriccion = new ListaRestriccion();
@@ -199,17 +215,14 @@ public class CargaArchivoController implements Serializable{
             }
             this.archivoFuente.setListaRestriccionCollection(listaRestriccionCollection);
             this.archivoFuente.setIdArchivoFuente(idArchivo);
-        } catch (ParserConfigurationException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
-            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
-            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
-            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SisgriException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
         }        
          
@@ -227,13 +240,13 @@ public class CargaArchivoController implements Serializable{
         int sigIdLista = 0;
         try {            
             Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder;
-            documentBuilder = dbf.newDocumentBuilder();
-            Document document = documentBuilder.parse(this.uploadedFile.getInputstream());
-            document.getDocumentElement().normalize();
-            NodeList listaNodo1 = document.getElementsByTagName("INDIVIDUAL");            
-            NodeList listaNodo2 = document.getElementsByTagName("ENTITY");   
+            File inputFile = new File(this.archivoTemporal.toString());
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(inputFile);
+            doc.getDocumentElement().normalize();
+            NodeList listaNodo1 = doc.getElementsByTagName("INDIVIDUAL");            
+            NodeList listaNodo2 = doc.getElementsByTagName("ENTITY");   
             sigIdLista = listaNodo1.getLength();
             for(int temp = 0; temp < sigIdLista; temp++){                
                 Node nodo1 = listaNodo1.item(temp);
@@ -275,17 +288,14 @@ public class CargaArchivoController implements Serializable{
             }
             this.archivoFuente.setListaRestriccionCollection(listaRestriccionCollection);
             this.archivoFuente.setIdArchivoFuente(idArchivo);
-        } catch (ParserConfigurationException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
-            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
-            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
-            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SisgriException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
         }        
          
@@ -299,12 +309,12 @@ public class CargaArchivoController implements Serializable{
     private void recorrerArchivoExterno(Calendar fechaActual){
         LOGGER.info("LOGGER :: recorrerArchivoFuente :: recorrerArchivoExterno");
         ListaRestriccion  listaRestriccion = null;
-        List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
         Calendar fechaReporte = null;
+        List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         try {  
             Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
-            DataInputStream entrada = new DataInputStream(this.uploadedFile.getInputstream());
+            FileInputStream entrada = new FileInputStream(this.archivoTemporal.toString());
             BufferedReader buffer = new BufferedReader(new InputStreamReader(entrada));
             String strLinea;
             int sigIdLista = 0;
@@ -327,9 +337,16 @@ public class CargaArchivoController implements Serializable{
             entrada.close();
             this.archivoFuente.setListaRestriccionCollection(listaRestriccionCollection);
             this.archivoFuente.setIdArchivoFuente(idArchivo);
-        }catch (Exception e){ //Catch de excepciones
+        }catch (SisgriException e){ 
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), e.getMessage()));            
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, e);
-        }                 
+        } catch (IOException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), e.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, e);
+        } catch (ParseException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), e.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, e);
+        }                
     } 
     
     
@@ -439,12 +456,15 @@ public class CargaArchivoController implements Serializable{
         this.usuario = usuario;
     }
 
-    public UploadedFile getUploadedFile() {
-        return uploadedFile;
+    public Path getRutaTemporal() {
+        return rutaTemporal;
     }
 
-    public void setUploadedFile(UploadedFile uploadedFile) {
-        this.uploadedFile = uploadedFile;
+    public void setRutaTemporal(Path rutaTemporal) {
+        this.rutaTemporal = rutaTemporal;
     }
+
+    
+    
     
 }
