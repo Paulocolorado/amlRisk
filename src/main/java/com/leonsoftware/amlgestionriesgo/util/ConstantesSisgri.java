@@ -40,6 +40,6 @@ public class ConstantesSisgri {
     public static final String MENU_SUBMENU = "S";
     public static final String MENU_ITEM = "I";
     
-    public static final String RUTA_TEMP = "/home/debian/amlRisk/generated";
+    public static final String RUTA_TEMP = "ruta_temporal";
     //public static final String RUTA_TEMP = "C:\\temp\\prueba";
 }

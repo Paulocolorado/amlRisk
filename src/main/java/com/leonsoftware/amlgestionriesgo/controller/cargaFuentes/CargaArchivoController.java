@@ -113,7 +113,7 @@ public class CargaArchivoController implements Serializable{
         this.EJBArchivo = new ArchivoFacade();
         this.ocultarBoton = true;
         this.usuario =  (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
-        this.rutaTemporal = Paths.get(ConstantesSisgri.RUTA_TEMP);        
+        this.rutaTemporal = Paths.get(this.mensajes.getString(ConstantesSisgri.RUTA_TEMP)) ;        
     }
     
     /**
@@ -150,8 +150,8 @@ public class CargaArchivoController implements Serializable{
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), null));            
             }
         }catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_LECTURA_ARCHIVO), ex.getMessage()));
-            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_LECTURA_ARCHIVO) + "->" + ex.getMessage(), ex.getMessage()));
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex.getMessage());
         }
     }    
 
