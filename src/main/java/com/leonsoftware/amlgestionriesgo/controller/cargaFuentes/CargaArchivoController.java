@@ -327,7 +327,7 @@ public class CargaArchivoController implements Serializable{
                 listaRestriccion.getListaRestriccionPK().setListaIdRegistro(sigIdLista);
                 listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
                 listaRestriccion.setListaPrimerNombre(campo[0]);
-                listaRestriccion.setListaUltimoNombre(campo[0]);
+                listaRestriccion.setListaUltimoNombre(campo[1]);
                 if(!campo[2].isEmpty()){
                     fechaReporte.setTime(sdf.parse(campo[2]));
                     
