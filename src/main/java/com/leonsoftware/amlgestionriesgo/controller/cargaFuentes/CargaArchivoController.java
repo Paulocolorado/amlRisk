@@ -143,9 +143,8 @@ public class CargaArchivoController implements Serializable{
                 this.archivoFuente.setNombreArchivoFuente(filename);
                 this.archivoFuente.setArchivoCargado(IOUtils.toByteArray(uploadedFile.getInputstream()));               
                 this.ocultarBoton = false;
-                //this.archivoTemporal = Files.createTempFile(this.rutaTemporal, filename + "-", "." + extension);                
-                //Files.copy(uploadedFile.getInputstream(), this.archivoTemporal, StandardCopyOption.REPLACE_EXISTING);               
-                this.archivoTemporal = Paths.get("/home/debian/amlRisk/generated/10112017pruebaonu.xml");
+                this.archivoTemporal = Files.createTempFile(this.rutaTemporal, filename + "-", "." + extension);                
+                Files.copy(uploadedFile.getInputstream(), this.archivoTemporal, StandardCopyOption.REPLACE_EXISTING);                               
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.archivoFuente.getNombreArchivoFuente() + "->" + this.mensajes.getString(ConstantesSisgri.MSJ_CARGA_OK), null));
             }else{
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), null));            
