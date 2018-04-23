@@ -1,0 +1,8 @@
+/*Scrips de crear PORC_COINCIDENCIA en la tabla tb_catalog 
+Version : 1.0
+Creado: 20/04/2018
+*/
+INSERT INTO `bd_sisgri`.`tb_catalogo` (`id_catalogo`, `fecha_creacion`, `usuario_creacion`, `fecha_modificacion`, `usuario_modificacion`) VALUES ('', NULL, NULL, NULL, NULL);INSERT INTO `bd_sisgri`.`tb_catalogo` (`id_catalogo`, `fecha_creacion`, `usuario_creacion`, `fecha_modificacion`, `usuario_modificacion`) VALUES ('PORC_COINCIDENCIA', '2017-10-17 14:59:50', 'adminSisgri', '2017-10-17 14:59:50', 'adminSisgri');
+INSERT INTO `bd_sisgri`.`tb_lista_catalogo` (`nombre_lista_catalogo`, `valor_lista_catalogo`, `fecha_creacion`, `usuario_creacion`, `fecha_modificacion`, `usuario_modificacion`, `tb_catalogo_id_catalogo`) VALUES ('25 %', '25', '2018-04-18 14:59:50', 'adminSisgri', '2018-04-18 14:59:50', 'adminSIsgri', 'PORC_COINCIDENCIA');
+INSERT INTO `bd_sisgri`.`tb_lista_catalogo` (`nombre_lista_catalogo`, `valor_lista_catalogo`, `fecha_creacion`, `usuario_creacion`, `fecha_modificacion`, `usuario_modificacion`, `tb_catalogo_id_catalogo`) VALUES ('50 %', '50', '2018-04-18 14:59:50', 'adminSisgri', '2018-04-18 14:59:50', 'adminSIsgri', 'PORC_COINCIDENCIA');
+INSERT INTO `bd_sisgri`.`tb_lista_catalogo` (`nombre_lista_catalogo`, `valor_lista_catalogo`, `fecha_creacion`, `usuario_creacion`, `fecha_modificacion`, `usuario_modificacion`, `tb_catalogo_id_catalogo`) VALUES ('75 %', '75', '2018-04-18 14:59:50', 'adminSisgri', '2018-04-18 14:59:50', 'adminSIsgri', 'PORC_COINCIDENCIA');

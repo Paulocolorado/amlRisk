@@ -6,7 +6,10 @@ package com.leonsoftware.amlgestionriesgo.controller.consultaListas;
 
 import com.leonsoftware.amlgestionriesgo.ejb.ArchivoFacade;
 import com.leonsoftware.amlgestionriesgo.ejb.ArchivoFacadeLocal;
+import com.leonsoftware.amlgestionriesgo.ejb.CatalogoFacade;
+import com.leonsoftware.amlgestionriesgo.ejb.CatalogoFacadeLocal;
 import com.leonsoftware.amlgestionriesgo.exception.SisgriException;
+import com.leonsoftware.amlgestionriesgo.model.ListaCatalogo;
 import com.leonsoftware.amlgestionriesgo.model.ListaRestriccion;
 import com.leonsoftware.amlgestionriesgo.util.ConstantesSisgri;
 import com.leonsoftware.amlgestionriesgo.util.UtilitarioLeonSoftware;
@@ -21,7 +24,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-
+ 
 
 /**
  * Clase para la gestion del formulario de consulta de listas
@@ -36,6 +39,8 @@ public class ConsultaListaController implements Serializable{
     private static final Logger LOGGER = Logger.getLogger("ConsultaListaController"); 
     @EJB
     private ArchivoFacadeLocal EJBArchivo;
+    @EJB
+    private CatalogoFacadeLocal EJBcatalogo;
     //TODO pojo cargaArchivo
     private String nombreApCliente;
     private String numeroID;
@@ -43,7 +48,9 @@ public class ConsultaListaController implements Serializable{
     private List listaArchivoCoincidencia;
     private ResourceBundle mensajes;
     private boolean visualizaResultado;
-
+    private List<ListaCatalogo> listaPorcentajeCoincidencia;
+    private Double porcentaje;
+    
     public ConsultaListaController() {
         LOGGER.info("LOGGER :: ConsultaListaController :: ConsultaListaController");
         this.nombreApCliente = null;
@@ -52,9 +59,8 @@ public class ConsultaListaController implements Serializable{
         this.listaArchivoCoincidencia = null;
         this.mensajes = null;
         this.visualizaResultado = false;
-        this.EJBArchivo = new ArchivoFacade();
-    }
-    
+        this.listaPorcentajeCoincidencia = null;
+     }
 
     @PostConstruct
     public void init() {
@@ -64,8 +70,22 @@ public class ConsultaListaController implements Serializable{
         this.listaClienteCoincide = new ArrayList<ListaRestriccion>();
         this.listaArchivoCoincidencia = new ArrayList();
         this.mensajes = new UtilitarioLeonSoftware().cargarMensajes();
+        this.listaPorcentajeCoincidencia = new ArrayList();
+        this.EJBcatalogo = new CatalogoFacade();
+        this.EJBArchivo = new ArchivoFacade();
+        this.porcentaje = ConstantesSisgri.PORCENTAJE_DEFECTO;
     }
-    
+    /**
+     * Metodo que permite iniciar las listas de la página
+     */
+    public void iniciarListas (){
+        LOGGER.info("LOGGER :: ConsultaListaController :: iniciarListas");        
+        try {
+             this.listaPorcentajeCoincidencia = EJBcatalogo.obtenerListaCatalogo(ConstantesSisgri.LISTA_PORCENTAJE);
+        } catch (SisgriException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_LISTA), ex.getMessage()));
+        }        
+    }
     /**
      * Encuentra coincidencias con el criterio ingresado
      */
@@ -84,7 +104,7 @@ public class ConsultaListaController implements Serializable{
                         porcentanjeAux = porcentanjeAux + porcPorPalabra;
                     }
                 }
-                if(porcentanjeAux >= ConstantesSisgri.PORCENTAJE_CINCUENTA){
+                if(porcentanjeAux >= this.porcentaje){
                     listaRestriccion.setPorcentaje(porcentanjeAux); 
                     this.listaClienteCoincide.add(listaRestriccion);
                 }
@@ -106,7 +126,7 @@ public class ConsultaListaController implements Serializable{
         this.nombreApCliente = new String();
         this.numeroID = new String();
     }
-    
+   
     /**
      * METODOS SET Y GET     
      * @return 
@@ -168,6 +188,21 @@ public class ConsultaListaController implements Serializable{
         this.numeroID = numeroID;
     }
  
+    public List getListaPorcentajeCoincidencia() {
+        return listaPorcentajeCoincidencia;
+    }
+
+    public void setListaPorcentajeCoincidencia(List listaPorcentajeCoincidencia) {
+        this.listaPorcentajeCoincidencia = listaPorcentajeCoincidencia;
+    }
+    
+    public Double getPorcentaje() {
+        return porcentaje;
+    }
+
+    public void setPorcentaje(Double porcentaje) {
+        this.porcentaje = porcentaje;
+    }
     
 }
 

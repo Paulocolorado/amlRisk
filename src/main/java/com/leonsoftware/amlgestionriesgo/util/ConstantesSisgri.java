@@ -20,17 +20,18 @@ public class ConstantesSisgri {
     public static final String MSJ_GUARDA_ARCHIVO_OK = "guardaArchivoExitosa";
     public static final String LISTA_ACCION = "ACCION_ARCHIVO";
     public static final String LISTA_FUENTE = "FUENTE_RIESGO";
+    public static final String LISTA_PORCENTAJE = "PORC_COINCIDENCIA";
     public static final String MSJ_ERROR_CONSULTA = "errorBuscaLista";
     public static final String ESPACIO_BLANCO = " ";
     public static final boolean FALSO = false;
     public static final boolean VERDADERO = true;
     public static final Double PORCENTAJE_CIEN = new Double(100);
-    public static final Double PORCENTAJE_CINCUENTA = new Double(50);
+    public static final Double PORCENTAJE_DEFECTO = new Double(75);
     public static final String PROCESADO_NO = "0";
     public static final String PROCESADO_SI = "1";
     public static final String SEPARADOR = " : ";
     public static final String VACIO = "";
-    
+        
     public static final String FUENTE_OFAC = "OFAC";
     public static final String FUENTE_ONU = "ONU";
     public static final String FUENTE_EXTERNA = "EXTERNA";

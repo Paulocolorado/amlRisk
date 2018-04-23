@@ -11,6 +11,7 @@
         <ui:composition template="./../plantillas/plantillaConMenu.xhtml">
             <ui:define name="content" >
                 
+                <f:event type="preRenderView" listener="#{consultaListaController.iniciarListas()}"/>
                 <h:form id="frmConsultaLista" enctype="multipart/form-data">
                     <h:panelGrid id="pnlgConsultaLista" style="width:100%">  
                         <p:panel id="pnlConsultaLista" header="#{msj.mnuConsultaLista}" >  
@@ -22,17 +23,23 @@
                                 <p:outputLabel for="numeroID" value="#{msj.numIdCliente}"  />
                                 <p:inputText id="numeroID" value="#{consultaListaController.numeroID}" tabindex="2" maxlength="40" size="40"/>  
 
+                                
+                                <p:outputLabel for="listaPorcentajeCoincidencia" value="#{msj.listaPorcentajeCoincidencia}" tabindex="3"/>
+                                <p:selectOneMenu id="listaPorcentajeCoincidencia" value="#{consultaListaController.porcentaje}" style="width:150px">
+                                    <f:selectItems value="#{consultaListaController.listaPorcentajeCoincidencia}"  var="porcentaje" itemLabel="#{porcentaje.listaCatalogoPK.nombreListaCatalogo}" itemValue="#{porcentaje.listaCatalogoPK.valorListaCatalogo}"/>
+                                </p:selectOneMenu>
+                                
                             </h:panelGrid> 
                             <br/>
                             <br/>
                             <center>  
-                                <p:commandButton id="btnBuscar" value="#{msj.buscar}"  update="frmConsultaLista" action="#{consultaListaController.buscarCoincidencia()}" tabindex="3"/>
+                                <p:commandButton id="btnBuscar" value="#{msj.buscar}"  update="frmConsultaLista" action="#{consultaListaController.buscarCoincidencia()}" tabindex="4"/>
                                 <p:blockUI block=":frmConsultaLista:pnlConsultaLista" trigger="btnBuscar">
                                     #{msj.buscandoCoincidencias}<br/>
                                      <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
                                 </p:blockUI>
                                 <p:spacer width="20" />
-                                <p:commandButton id="btnLimpiar" value="#{msj.limpiar}"  update="frmConsultaLista" action="#{consultaListaController.limpiarFormulario()}" tabindex="4"/>
+                                <p:commandButton id="btnLimpiar" value="#{msj.limpiar}"  update="frmConsultaLista" action="#{consultaListaController.limpiarFormulario()}" tabindex="5"/>
                             </center>    
                             <br/>
                             <br/>                                           
