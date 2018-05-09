@@ -26,3 +26,16 @@ a:link:hover, a:visited:hover  {
   font-weight : bold;
   text-decoration : underline;
 }
+
+#principal{
+width: 104px;
+background-color: black; 
+}
+
+cuadro{
+    margin: 2px auto;
+    width: 100px !important;
+    text-align: center;
+    background-color: black;
+    
+}

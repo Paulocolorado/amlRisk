@@ -58,4 +58,12 @@
   text-decoration : underline;
 }
 
+#frmAutenticacion{
+background-color: black; 
+}
 
+#cuadro{
+    margin: 2px auto;
+    width: 100px !important;
+    text-align: center;   
+}

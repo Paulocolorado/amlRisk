@@ -24,7 +24,7 @@
                             <p:commandButton value="#{msj.ingresar}" action="#{autenticacionController.iniciaSesion()}" tabindex="3" update="frmAutenticacion" />
                         </h:panelGrid>
                         <p:separator/>
-                        <p:commandLink id="recordarClave" tabindex="4" value="#{msj.recordarClave}"/>                                
+                        <p:commandLink id="recordarClave" tabindex="4" value="#{msj.recordarClave}" action="gestionUsuario/recordarClave.xhtml" process="@this" />                                
                     </p:panel>        
                 </h:form>  
             </ui:define>

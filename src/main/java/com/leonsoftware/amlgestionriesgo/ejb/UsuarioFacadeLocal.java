@@ -16,4 +16,6 @@ import javax.ejb.Local;
 @Local
 public interface UsuarioFacadeLocal {
      Usuario iniciarSesion (Usuario pUsuario) throws SisgriException;
+     
+     Usuario recuperarUsuarioPorNombre (Usuario pUsuario) throws SisgriException;
 }

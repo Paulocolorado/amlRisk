@@ -58,7 +58,52 @@ public class UsuarioFacadeLocalImpl extends AbstractFacade<Usuario> implements U
             throw new SisgriException("Error al consultar la base de datos" + e.getMessage());            
         }      
        return usuario;       
-    }   
+    }
+    /**
+     * Metodo que busca por nombre de Usuario
+     * @param pUsuario
+     * @return Usuario
+     * @throws SisgriException 
+     */
+        @Override
+    public Usuario  recuperarUsuarioPorNombre(Usuario pUsuario) throws SisgriException{
+        Usuario usuario = null; 
+        List<Usuario> listaUsuario;         
+        String consulta;        
+        try{     
+            consulta = "SELECT u FROM Usuario u WHERE u.usuario = :usuario" ;
+            Query q = em.createQuery(consulta);
+            q.setParameter("usuario", pUsuario.getUsuario().trim());
+         
+            listaUsuario = q.getResultList();    
+            if(!listaUsuario.isEmpty()){
+                usuario = listaUsuario.get(0);
+            }
+        }catch(Exception e) {
+            throw new SisgriException("Error al consultar la base de datos" + e.getMessage());            
+        }      
+       return usuario;       
+    }
+    
+    public Usuario recuperarClave(Usuario pUsuario) throws SisgriException{
+        Usuario usuario = null;
+        Usuario ClaveUsuario = null;
+        List<Usuario> listaUsuario;         
+        String consulta;        
+        try{     
+            consulta = "SELECT u FROM Usuario u WHERE u.usuario = :usuario" ;
+            Query q = em.createQuery(consulta);
+            q.setParameter("usuario", pUsuario.getUsuario().trim());
+            q.setParameter("claveUsuario", pUsuario.getClaveUsuario().trim());         
+            listaUsuario = q.getResultList();    
+            if(!listaUsuario.isEmpty()){
+                usuario = listaUsuario.get(0);
+            }
+        }catch(Exception e) {
+            throw new SisgriException("Error al consultar la base de datos" + e.getMessage());            
+        }      
+       return ClaveUsuario;       
+    }
     
     public EntityManager getEm() {
         return em;

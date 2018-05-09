@@ -20,11 +20,9 @@ import com.leonsoftware.amlgestionriesgo.model.Usuario;
 import com.leonsoftware.amlgestionriesgo.util.ConstantesSisgri;
 import com.leonsoftware.amlgestionriesgo.util.UtilitarioLeonSoftware;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -37,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,6 +53,7 @@ import org.apache.commons.io.IOUtils;
 
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.primefaces.push.inject.PathParamIntrospector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -82,6 +82,7 @@ public class CargaArchivoController implements Serializable{
     private Usuario usuario;
     private Path rutaTemporal;
     private Path archivoTemporal;
+    private Properties props;
  
 
     
@@ -98,6 +99,7 @@ public class CargaArchivoController implements Serializable{
         this.usuario = null;
         this.rutaTemporal = null;
         this.archivoTemporal = null;
+        this.props = null;
     }
 
     /**
@@ -113,7 +115,8 @@ public class CargaArchivoController implements Serializable{
         this.EJBArchivo = new ArchivoFacade();
         this.ocultarBoton = true;
         this.usuario =  (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
-        this.rutaTemporal = Paths.get(this.mensajes.getString(ConstantesSisgri.RUTA_TEMP)) ;        
+        this.props = new Properties();
+        this.rutaTemporal = new PathParamIntrospector();
     }
     
     /**
@@ -124,6 +127,8 @@ public class CargaArchivoController implements Serializable{
         try {   
             this.listaAccion = EJBcatalogo.obtenerListaCatalogo(ConstantesSisgri.LISTA_ACCION);
             this.listaFuente = EJBcatalogo.obtenerListaCatalogo(ConstantesSisgri.LISTA_FUENTE);
+            this.props = new UtilitarioLeonSoftware().cargarConfiguracion();
+            this.rutaTemporal = Paths.get(this.props.getProperty(ConstantesSisgri.RUTA_TEMP)) ;
         } catch (SisgriException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_LISTA), ex.getMessage()));
         }        
