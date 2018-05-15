@@ -53,7 +53,6 @@ import org.apache.commons.io.IOUtils;
 
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
-import org.primefaces.push.inject.PathParamIntrospector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -69,6 +68,7 @@ import org.xml.sax.SAXException;
 public class CargaArchivoController implements Serializable{
     
     private static final Logger LOGGER = Logger.getLogger("CargaArchivoController");     
+    private static final long serialVersionUID = 970364273022644336L;
     @EJB
     private CatalogoFacadeLocal EJBcatalogo;
     @EJB
@@ -82,8 +82,7 @@ public class CargaArchivoController implements Serializable{
     private Usuario usuario;
     private Path rutaTemporal;
     private Path archivoTemporal;
-    private Properties props;
- 
+    private Properties props; 
 
     
     /**
@@ -116,7 +115,6 @@ public class CargaArchivoController implements Serializable{
         this.ocultarBoton = true;
         this.usuario =  (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
         this.props = new Properties();
-        this.rutaTemporal = new PathParamIntrospector();
     }
     
     /**
@@ -229,8 +227,7 @@ public class CargaArchivoController implements Serializable{
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
-        }        
-         
+        }                 
     }   
     
     /**
@@ -270,8 +267,7 @@ public class CargaArchivoController implements Serializable{
                     listaRestriccion.setFechaModificacion(fechaActual.getTime());
                 }
                 listaRestriccionCollection.add(listaRestriccion);
-            }    
-                   
+            }                       
             for(int j = 0; j < listaNodo2.getLength(); j++){      
                 Node nodo2 = listaNodo2.item(j);
                 listaRestriccion = new ListaRestriccion();
@@ -302,11 +298,10 @@ public class CargaArchivoController implements Serializable{
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
-        }        
-         
+        }                 
     } 
     
-        /**
+    /**
      * Metodo que permite recorrer el xml de OFAC
      * 
      * @param fechaActual 
@@ -314,8 +309,10 @@ public class CargaArchivoController implements Serializable{
     private void recorrerArchivoExterno(Calendar fechaActual){
         LOGGER.info("LOGGER :: recorrerArchivoFuente :: recorrerArchivoExterno");
         ListaRestriccion  listaRestriccion = null;
-        Calendar fechaReporte = null;
+        ListaIdRestriccion listaIdRestriccion = null;
         List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
+        List<ListaIdRestriccion> listaIdRestriccionCollection = new ArrayList<ListaIdRestriccion>();
+        Calendar fechaReporte = null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         try {  
             Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
@@ -324,21 +321,35 @@ public class CargaArchivoController implements Serializable{
             String strLinea;
             int sigIdLista = 0;
             fechaReporte = Calendar.getInstance();  
-            while ((strLinea = buffer.readLine()) != null)   {
-                System.out.println (strLinea);
+            while ((strLinea = buffer.readLine()) != null){
                 listaRestriccion = new ListaRestriccion();
+                listaIdRestriccion = new ListaIdRestriccion();
                 listaRestriccion.setListaRestriccionPK(new ListaRestriccionPK());
+                listaIdRestriccion.setListaIdRestriccionPK(new ListaIdRestriccionPK());
                 String[] campo = strLinea.split(ConstantesSisgri.SEPARADOR_ARCH_TEXTO);
                 listaRestriccion.getListaRestriccionPK().setListaIdRegistro(sigIdLista);
-                listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
-                listaRestriccion.setListaPrimerNombre(campo[0]);
-                listaRestriccion.setListaUltimoNombre(campo[1]);
-                if(!campo[2].isEmpty()){
-                    fechaReporte.setTime(sdf.parse(campo[2]));
-                    
+                listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);                                
+                
+                listaIdRestriccion.getListaIdRestriccionPK().setListaIdRestriccionId(ConstantesSisgri.INDICE_INICIAL);
+                listaIdRestriccion.getListaIdRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                listaIdRestriccion.getListaIdRestriccionPK().setTbListaRestriccionListaIdRegistro(sigIdLista);
+                listaIdRestriccion.setTipoId(campo[0] == null ? ConstantesSisgri.VACIO : campo[0]);
+                listaIdRestriccion.setNumeroId(campo[1] == null ? ConstantesSisgri.VACIO : campo[1]);
+                listaIdRestriccion.setPaisId(campo[2] == null ? ConstantesSisgri.VACIO : campo[2]); 
+                listaIdRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                listaIdRestriccion.setFechaCreacion(fechaActual.getTime());
+                listaIdRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                listaIdRestriccion.setFechaModificacion(fechaActual.getTime());
+                listaIdRestriccionCollection.add(listaIdRestriccion);   
+                
+                listaRestriccion.setListaPrimerNombre(campo[3]);
+                listaRestriccion.setListaUltimoNombre(campo[4]);
+                if(!campo[5].isEmpty()){
+                    fechaReporte.setTime(sdf.parse(campo[5]));                    
                 }
                 listaRestriccion.setListaFechaReporte(fechaReporte.getTime());
-                listaRestriccion.setListaObservacion(campo[3]);
+                listaRestriccion.setListaObservacion(campo[6]);
+                listaRestriccion.setListaIdRestriccionCollection(listaIdRestriccionCollection);
                 listaRestriccionCollection.add(listaRestriccion); 
                 sigIdLista = sigIdLista + 1;
             }

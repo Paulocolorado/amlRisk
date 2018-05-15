@@ -90,8 +90,9 @@ public class ConsultaListaController implements Serializable{
      * Encuentra coincidencias con el criterio ingresado
      */
     public void buscarCoincidencia(){
-        LOGGER.info("LOGGER :: ConsultaListaController :: buscarCoincidencia");     
+        LOGGER.info("LOGGER :: ConsultaListaController :: buscarCoincidencia");            
         this.visualizaResultado = true;
+        this.listaClienteCoincide.clear();
         String[] parametros = this.nombreApCliente.split(ConstantesSisgri.ESPACIO_BLANCO);  
         Double porcPorPalabra = (ConstantesSisgri.PORCENTAJE_CIEN / parametros.length);
         Double porcentanjeAux;

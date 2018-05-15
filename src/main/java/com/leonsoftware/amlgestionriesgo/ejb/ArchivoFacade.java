@@ -37,6 +37,7 @@ import javax.transaction.Transactional;
 public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFacadeLocal,Serializable {
 
     private static final Logger LOGGER = Logger.getLogger("CargaArchivoController");     
+    private static final long serialVersionUID = 1230256314000585821L;
     
     private EntityManager em;
     private EntityManagerFactory emf;
