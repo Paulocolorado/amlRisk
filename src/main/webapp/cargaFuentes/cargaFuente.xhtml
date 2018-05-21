@@ -17,7 +17,7 @@
                     <h:panelGrid id="pnlgCargaFuente" style="width:100%">                                                                               
                         <p:panel  id="pnlCargaFuente"  header="#{msj.mnuCargaFuente}">
                             <p:growl id="messages" showDetail="true" />                           
-                            <p:fileUpload id="btnValidaArchivo" required="true" multiple="false" allowTypes="/(\.|\/)(txt|xml)$/" label="#{msj.cargaArchivo}" cancelLabel="#{msj.cancelar}" uploadLabel="#{msj.carga}" fileUploadListener="#{cargaArchivoController.cargarArchivoListener}" update="btnCargandoArchivo" />                                 
+                            <p:fileUpload id="btnValidaArchivo" required="true" multiple="false" allowTypes="/(\.|\/)(txt|xml|xls|xlsx)$/" label="#{msj.cargaArchivo}" cancelLabel="#{msj.cancelar}" uploadLabel="#{msj.carga}" fileUploadListener="#{cargaArchivoController.cargarArchivoListener}" update="btnCargandoArchivo" />                                 
                             <br/>
                             <br/>                            
                             <h:panelGrid id="pnlgAccion" style="width:100%" >

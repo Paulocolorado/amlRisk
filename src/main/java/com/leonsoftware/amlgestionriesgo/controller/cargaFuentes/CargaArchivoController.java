@@ -22,6 +22,7 @@ import com.leonsoftware.amlgestionriesgo.util.UtilitarioLeonSoftware;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -33,6 +34,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -50,6 +52,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
@@ -91,7 +101,7 @@ public class CargaArchivoController implements Serializable{
     public CargaArchivoController() {
         LOGGER.info("LOGGER :: CargaArchivoController :: Construct");
         this.mensajes = null;
-        this.archivoFuente = new ArchivoFuente();
+        this.archivoFuente = null;
         this.listaAccion = null;
         this.listaFuente = null;
         this.ocultarBoton = true;
@@ -115,6 +125,7 @@ public class CargaArchivoController implements Serializable{
         this.ocultarBoton = true;
         this.usuario =  (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
         this.props = new Properties();
+        this.archivoFuente = new ArchivoFuente();
     }
     
     /**
@@ -143,7 +154,7 @@ public class CargaArchivoController implements Serializable{
             if(uploadedFile != null) {  
                 String filename = FilenameUtils.getName(uploadedFile.getFileName());
                 String extension = FilenameUtils.getExtension(uploadedFile.getFileName());                
-                this.archivoFuente.setNombreArchivoFuente(filename);
+                this.archivoFuente.setNombreArchivoFuente(filename.toLowerCase());
                 this.archivoFuente.setArchivoCargado(IOUtils.toByteArray(uploadedFile.getInputstream()));               
                 this.ocultarBoton = false;
                 this.archivoTemporal = Files.createTempFile(this.rutaTemporal, filename + "-", "." + extension);                
@@ -302,11 +313,11 @@ public class CargaArchivoController implements Serializable{
     } 
     
     /**
-     * Metodo que permite recorrer el xml de OFAC
+     * Metodo que permite recorrer el xml de externo
      * 
      * @param fechaActual 
      */
-    private void recorrerArchivoExterno(Calendar fechaActual){
+    private void recorrerArchivoExternoTexto(Calendar fechaActual){
         LOGGER.info("LOGGER :: recorrerArchivoFuente :: recorrerArchivoExterno");
         ListaRestriccion  listaRestriccion = null;
         ListaIdRestriccion listaIdRestriccion = null;
@@ -329,18 +340,24 @@ public class CargaArchivoController implements Serializable{
                 String[] campo = strLinea.split(ConstantesSisgri.SEPARADOR_ARCH_TEXTO);
                 listaRestriccion.getListaRestriccionPK().setListaIdRegistro(sigIdLista);
                 listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);                                
+                listaRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                listaRestriccion.setFechaCreacion(fechaActual.getTime());
+                listaRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                listaRestriccion.setFechaModificacion(fechaActual.getTime());
                 
-                listaIdRestriccion.getListaIdRestriccionPK().setListaIdRestriccionId(ConstantesSisgri.INDICE_INICIAL);
-                listaIdRestriccion.getListaIdRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
-                listaIdRestriccion.getListaIdRestriccionPK().setTbListaRestriccionListaIdRegistro(sigIdLista);
-                listaIdRestriccion.setTipoId(campo[0] == null ? ConstantesSisgri.VACIO : campo[0]);
-                listaIdRestriccion.setNumeroId(campo[1] == null ? ConstantesSisgri.VACIO : campo[1]);
-                listaIdRestriccion.setPaisId(campo[2] == null ? ConstantesSisgri.VACIO : campo[2]); 
-                listaIdRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
-                listaIdRestriccion.setFechaCreacion(fechaActual.getTime());
-                listaIdRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
-                listaIdRestriccion.setFechaModificacion(fechaActual.getTime());
-                listaIdRestriccionCollection.add(listaIdRestriccion);   
+                if (!campo[1].isEmpty()){
+                    listaIdRestriccion.getListaIdRestriccionPK().setListaIdRestriccionId(ConstantesSisgri.INDICE_INICIAL);
+                    listaIdRestriccion.getListaIdRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                    listaIdRestriccion.getListaIdRestriccionPK().setTbListaRestriccionListaIdRegistro(sigIdLista);
+                    listaIdRestriccion.setTipoId(campo[0] == null ? ConstantesSisgri.VACIO : campo[0]);
+                    listaIdRestriccion.setNumeroId(campo[1] == null ? ConstantesSisgri.VACIO : campo[1]);
+                    listaIdRestriccion.setPaisId(campo[2] == null ? ConstantesSisgri.VACIO : campo[2]); 
+                    listaIdRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                    listaIdRestriccion.setFechaCreacion(fechaActual.getTime());
+                    listaIdRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                    listaIdRestriccion.setFechaModificacion(fechaActual.getTime());
+                    listaIdRestriccionCollection.add(listaIdRestriccion);   
+                }
                 
                 listaRestriccion.setListaPrimerNombre(campo[3]);
                 listaRestriccion.setListaUltimoNombre(campo[4]);
@@ -367,6 +384,127 @@ public class CargaArchivoController implements Serializable{
             Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, e);
         }                
     } 
+    
+    /**
+     * Metodo que permite recorrer el excel de la fuente externa
+     * 
+     * @param fechaActual 
+     */
+    private void recorrerArchivoExternoExcel(Calendar fechaActual){   
+        LOGGER.info("LOGGER :: recorrerArchivoFuente :: recorrerArchivoExternoExcel");
+        ListaRestriccion  listaRestriccion = null;
+        ListaIdRestriccion listaIdRestriccion = null;
+        List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
+        List<ListaIdRestriccion> listaIdRestriccionCollection = new ArrayList<ListaIdRestriccion>();
+        Calendar fechaReporte = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        int sigIdLista = 0;
+        fechaReporte = Calendar.getInstance(); 
+        boolean tieneID = false;
+        try{
+            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            FileInputStream entrada = new FileInputStream(this.archivoTemporal.toString());             
+            XSSFWorkbook workbook = new XSSFWorkbook(entrada);
+            XSSFSheet sheet = workbook.getSheetAt(ConstantesSisgri.INDICE_INICIAL);
+            Iterator<Row> rowIterator = sheet.iterator();
+            Row row;
+            while (rowIterator.hasNext()) {
+                row = rowIterator.next();
+                listaRestriccion = new ListaRestriccion();
+                listaIdRestriccion = new ListaIdRestriccion();
+                listaRestriccion.setListaRestriccionPK(new ListaRestriccionPK());
+                listaIdRestriccion.setListaIdRestriccionPK(new ListaIdRestriccionPK());
+                Iterator<Cell> cellIterator = row.cellIterator();
+                Cell celda;
+                while (cellIterator.hasNext()) {
+                    celda = cellIterator.next();
+                    switch(celda.getColumnIndex()) {
+                        case 0:  
+                            if(celda != null){
+                                listaIdRestriccion.setTipoId(celda.toString());
+                                tieneID = true;
+                            }
+                            break;
+                        case 1:
+                            if(celda != null){
+                                listaIdRestriccion.setNumeroId(celda == null ? ConstantesSisgri.VACIO : celda.toString());
+                                tieneID = true;
+                            }    
+                            break;
+                        case 2: 
+                            if(celda != null){
+                                listaIdRestriccion.setPaisId(celda == null ? ConstantesSisgri.VACIO : celda.toString());
+                                tieneID = true;
+                            }    
+                            break;    
+                        case 3: 
+                            listaRestriccion.setListaPrimerNombre(celda == null ? ConstantesSisgri.VACIO : celda.toString());
+                            break;    
+                        case 4: 
+                            listaRestriccion.setListaUltimoNombre(celda == null ? ConstantesSisgri.VACIO : celda.toString());
+                            break;        
+                        case 5: 
+                            if(celda != null){
+                                fechaReporte.setTime(sdf.parse((celda.toString())));                    
+                            }
+                            listaRestriccion.setListaFechaReporte(fechaReporte.getTime());
+                            break;        
+                        case 6:                             
+                            listaRestriccion.setListaObservacion(celda.getStringCellValue());                            
+                            break;      
+                    }
+                }                
+                if(tieneID){
+                    listaIdRestriccion.getListaIdRestriccionPK().setTbListaRestriccionListaIdRegistro(sigIdLista);
+                    listaIdRestriccion.getListaIdRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);
+                    listaIdRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                    listaIdRestriccion.setFechaCreacion(fechaActual.getTime());
+                    listaIdRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                    listaIdRestriccion.setFechaModificacion(fechaActual.getTime());
+                    listaIdRestriccionCollection.add(listaIdRestriccion); 
+                }
+                listaRestriccion.getListaRestriccionPK().setListaIdRegistro(sigIdLista);
+                listaRestriccion.getListaRestriccionPK().setTbArchivoFuenteIdArchivoFuente(idArchivo);  
+                listaRestriccion.setUsuarioCreacion(this.usuario.getNombreUsuario());
+                listaRestriccion.setFechaCreacion(fechaActual.getTime());
+                listaRestriccion.setUsuarioModificacion(this.usuario.getNombreUsuario());
+                listaRestriccion.setFechaModificacion(fechaActual.getTime());
+                                  
+                listaRestriccion.setListaIdRestriccionCollection(listaIdRestriccionCollection);
+                listaRestriccionCollection.add(listaRestriccion); 
+                sigIdLista = sigIdLista + 1;
+            }
+            this.archivoFuente.setListaRestriccionCollection(listaRestriccionCollection);
+            this.archivoFuente.setIdArchivoFuente(idArchivo);
+            entrada.close();
+        }catch (FileNotFoundException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SisgriException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,this.archivoFuente.getNombreArchivoFuente() + this.mensajes.getString(ConstantesSisgri.MSJ_ERROR_CARGA), ex.getMessage()));            
+            Logger.getLogger(CargaArchivoController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }    
+    
+    
+    /**
+     * Metodo que permite identificar el tipo de recorrido para la fuente externa
+     * 
+     * @param fechaActual 
+     */
+    private void recorrerArchivoExterno(Calendar fechaActual){
+        if(this.archivoFuente.getNombreArchivoFuente().contains(ConstantesSisgri.EXTENSION_EXCEL)){
+            this.recorrerArchivoExternoExcel(fechaActual); 
+        }else{
+            this.recorrerArchivoExternoTexto(fechaActual);
+        }        
+    }
     
     
     /**

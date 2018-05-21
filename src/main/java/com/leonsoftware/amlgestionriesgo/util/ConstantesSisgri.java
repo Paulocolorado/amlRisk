@@ -53,6 +53,9 @@ public class ConstantesSisgri {
     public static final String CORREO_MAILMENSAJE = "mail.mensaje";
     
     public static final int INDICE_INICIAL = 0;
-    public static final int INDICE_FINAL = 4;
+    public static final int INDICE_FINAL = 4;   
+        
+    public static final String EXTENSION_EXCEL = "xls";
+    public static final String MSJ_ERROR_EXCEL_VACIO = "";
 
 }
