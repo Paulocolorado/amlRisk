@@ -26,18 +26,18 @@
                                     <h:outputText value="#{archivoClienteResultado.nombreArchivoCliMasivo}" />
                                 </p:column>
 
-                                <p:column headerText="#{msj.fechaCarga}">
+                                <p:column headerText="#{msj.fechaCarga}" sortBy="#{archivoClienteResultado.fechaCarga}" >
                                     <h:outputText value="#{archivoClienteResultado.fechaCarga}" />
                                 </p:column>
 
                                 <p:column headerText="#{msj.accion}" >                                    
                                     <p:commandButton id="btnProceso"  value="#{msj.cruzar}" actionListener="#{consultaListaMasivoController.cruzarArchivoCliente(archivoClienteResultado)}" />                                      
-                                    <p:spacer width="20 " />
+                                   <p:spacer width="20"/>
                                     <p:commandButton id="btnDescarga" update=":frmConsultaMasivoLista:pnlResultadoCruce" actionListener="#{consultaListaMasivoController.consultarCruceClienteLista(archivoClienteResultado)}" oncomplete="PF('clienteCruce').show()" icon="ui-icon-search" title="#{msj.resultadoCruce}" />                                     
-                                         <p:blockUI block=":frmConsultaMasivoLista:pnlgConsultaMasivoLista" trigger="btnProceso">
-                                            #{msj.procesando}<br/>
-                                            <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
-                                        </p:blockUI>
+                                    <p:blockUI block=":frmConsultaMasivoLista:pnlgConsultaMasivoLista" trigger="btnProceso">
+                                       #{msj.procesando}<br/>
+                                       <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
+                                    </p:blockUI>
                                 </p:column>                                
                             </p:dataTable>    
                             

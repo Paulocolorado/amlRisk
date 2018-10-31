@@ -29,7 +29,8 @@ import java.util.logging.Logger;
 @Named
 @ViewScoped    
 public class RecordarClaveController implements Serializable{
-    
+
+    private static final long serialVersionUID = 6148708188849773213L;    
     @EJB
     private UsuarioFacadeLocalImpl EJBusuario;
     private Usuario usuario;

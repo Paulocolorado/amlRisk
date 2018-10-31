@@ -22,7 +22,7 @@ public interface ArchivoFacadeLocal {
     
     public void guardarArchivo(ArchivoFuente pArchivoFuente) throws SisgriException;
     
-    public Integer obtnerIdSigArchivo () throws SisgriException;
+    public Integer obtenerIdSigArchivo () throws SisgriException;
     
     public List<ListaRestriccion> buscarListaCoincidencia(String[] parametros, String pNumeroID) throws SisgriException;
     
@@ -33,4 +33,6 @@ public interface ArchivoFacadeLocal {
     public void cruzarClientes(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException;    
     
     public List<CruceClienteLista> consultarCruceClienteLista(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException;
+    
+    public Integer obtenerIdSigArchivoCliente() throws SisgriException;
 }

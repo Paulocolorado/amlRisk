@@ -4,8 +4,7 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.leonsoftware.amlgestionriesgo.model.CruceClienteLista</class>
     <class>com.leonsoftware.amlgestionriesgo.model.Menu</class>
-    <class>com.leonsoftware.amlgestionriesgo.model.ListaIdRestriccion</class>
-    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <class>com.leonsoftware.amlgestionriesgo.model.ListaIdRestriccion</class>   
     <class>com.leonsoftware.amlgestionriesgo.model.Usuario</class>
     <class>com.leonsoftware.amlgestionriesgo.model.ArchivoFuente</class>
     <class>com.leonsoftware.amlgestionriesgo.model.Catalogo</class>
@@ -13,6 +12,7 @@
     <class>com.leonsoftware.amlgestionriesgo.model.ListaRestriccion</class>
     <class>com.leonsoftware.amlgestionriesgo.model.ArchivoClienteMasivo</class>
     <class>com.leonsoftware.amlgestionriesgo.model.ClienteMasivo</class>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/bd_sisgri"/>

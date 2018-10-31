@@ -27,21 +27,23 @@ import javax.inject.Named;
  * Clase para la gestion del formulario de consulta de listas
  * @author Carolina Colorado
  * @since 27/09/2017
- * @version 1.0
+ * @version 1.1
  */
 @Named
 @ViewScoped   
 public class ConsultaListaMasivoController implements Serializable{
-    
+        
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = Logger.getLogger("ConsultaListaMasivoController"); 
-
     @EJB
     private ArchivoFacadeLocal EJBArchivo;  
     private ResourceBundle mensajes;
     private List<ArchivoClienteMasivo> listaArchivoClienteMasivo;
     private List<CruceClienteLista> listaCruceClienteLista;
 
-
+    /**
+     * Constructor
+     */
     public ConsultaListaMasivoController() {
         LOGGER.info("LOGGER :: ConsultaListaMasivoController :: ConsultaListaMasivoController");
         this.listaArchivoClienteMasivo = null;
@@ -49,6 +51,9 @@ public class ConsultaListaMasivoController implements Serializable{
         this.listaCruceClienteLista = null;
     }
     
+    /**
+     * Post Constructor
+     */
     @PostConstruct
     public void init() {
         LOGGER.info("LOGGER :: ConsultaListaMasivoController :: init");        
@@ -57,16 +62,23 @@ public class ConsultaListaMasivoController implements Serializable{
         this.listaCruceClienteLista = new ArrayList<CruceClienteLista>();
     }
     
-  public void consultaArchivoMasivo(){
+    /**
+     * Método que permite consultar archivo masivo de cliente
+     */
+    
+    public void consultaArchivoMasivo(){
+        LOGGER.info("LOGGER :: ConsultaListaMasivoController :: consultaArchivoMasivo");
         try {            
-            LOGGER.info("LOGGER :: ConsultaListaMasivoController :: consultaArchivoMasivo");
             this.listaArchivoClienteMasivo = EJBArchivo.consultaArchivoMasivo();
         } catch (SisgriException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.getMensajes().getString(ConstantesSisgri.MSJ_ERROR_CONSULTA), ex.getMessage()));
         }
-            
-  }
+    }
     
+    /**
+     * Metodo que permite lanzar el proceso de cruce
+     * @param pArchivoClienteMasivo 
+     */
     public void cruzarArchivoCliente(ArchivoClienteMasivo pArchivoClienteMasivo){    
         LOGGER.info("LOGGER :: ConsultaListaMasivoController :: init");
         try {
@@ -76,21 +88,23 @@ public class ConsultaListaMasivoController implements Serializable{
         }
     }
     
+    /**
+     * Método que permite consultar el resultado del cruce
+     * @param pArchivoClienteMasivo 
+     */
     public void consultarCruceClienteLista(ArchivoClienteMasivo pArchivoClienteMasivo){
         LOGGER.info("LOGGER :: ConsultaListaMasivoController :: init"); 
         try{
             this.listaCruceClienteLista = EJBArchivo.consultarCruceClienteLista(pArchivoClienteMasivo);
         }catch(SisgriException e){
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,this.getMensajes().getString(ConstantesSisgri.MSJ_ERROR_CONSULTA), e.getMessage()));
-        }
-        
+        }        
     }
 
     
     /*
      * METODOS SET Y GET     
      */
-
 
     public List<ArchivoClienteMasivo> getListaArchivoClienteMasivo() {
         return listaArchivoClienteMasivo;

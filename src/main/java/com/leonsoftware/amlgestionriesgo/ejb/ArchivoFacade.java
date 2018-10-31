@@ -92,7 +92,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
       * @throws SisgriException 
       */
      @Override
-     public Integer obtnerIdSigArchivo () throws SisgriException{
+     public Integer obtenerIdSigArchivo () throws SisgriException{
         Integer sigIdArchivo =  null;      
         String consulta;        
         try{   
@@ -174,8 +174,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         EntityTransaction tx = em.getTransaction();
         try{
             this.em.getEntityManagerFactory().getCache().evictAll();
-            tx.begin();
-            parchivoClienteMasivo.setIdArchivoCliMasivo(obtnerIdSigArchivoCliente());             
+            tx.begin();            
             this.em.persist(parchivoClienteMasivo);              
             tx.commit();
         }catch(Exception e){
@@ -183,28 +182,29 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
         }
     }
      
-      /**
-      * Metodo que permite obtener el Id siguiente de la tabla de tb_archivo_cliente_masivo para insertar
-      * @return
-      * @throws SisgriException 
-      */
-     public Integer obtnerIdSigArchivoCliente() throws SisgriException{
-        Integer sigIdArchivoCliente =  null;      
-        String consulta;        
-        try{     
-            this.em.getEntityManagerFactory().getCache().evictAll();
-            consulta = "SELECT MAX(a.id_archivo_cli_masivo) FROM tb_archivo_cliente_masivo a " ;
-            Query q = this.em.createNativeQuery(consulta);     
-            sigIdArchivoCliente = (Integer) q.getSingleResult();
-            if(sigIdArchivoCliente == null){
-               sigIdArchivoCliente = 0;
-            }
-        }catch(NoResultException e) {
-            throw new SisgriException(e.getMessage());            
-        }              
-        return sigIdArchivoCliente + 1;
-                 
-     }
+    /**
+    * Metodo que permite obtener el Id siguiente de la tabla de tb_archivo_cliente_masivo para insertar
+    * @return
+    * @throws SisgriException 
+    */
+    @Override
+    public Integer obtenerIdSigArchivoCliente() throws SisgriException{
+       Integer sigIdArchivoCliente =  null;      
+       String consulta;        
+       try{     
+           this.em.getEntityManagerFactory().getCache().evictAll();
+           consulta = "SELECT MAX(a.id_archivo_cli_masivo) FROM tb_archivo_cliente_masivo a " ;
+           Query q = this.em.createNativeQuery(consulta);     
+           sigIdArchivoCliente = (Integer) q.getSingleResult();
+           if(sigIdArchivoCliente == null){
+              sigIdArchivoCliente = 0;
+           }
+       }catch(NoResultException e) {
+           throw new SisgriException(e.getMessage());            
+       }              
+       return sigIdArchivoCliente + 1;
+
+    }
     
      /**
       * Metodo que consulta los archivos para cruce maasivo cargados
@@ -228,7 +228,7 @@ public class ArchivoFacade extends AbstractFacade<Catalogo> implements ArchivoFa
      
     
     
-        @Override
+    @Override
     public void cruzarClientes(ArchivoClienteMasivo parchivoClienteMasivo) throws SisgriException{
         try{           
             StoredProcedureQuery query = this.em.createStoredProcedureQuery("prc_cruzar_listas_clientes")

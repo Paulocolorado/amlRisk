@@ -57,7 +57,8 @@ public class ClienteMasivo implements Serializable {
     private String usuarioCreacion;
     @Size(max = 45)
     @Column(name = "fecha_modificacion")
-    private String fechaModificacion;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date fechaModificacion;
     @Size(max = 45)
     @Column(name = "usuario_modificacion")
     private String usuarioModificacion;
@@ -116,11 +117,11 @@ public class ClienteMasivo implements Serializable {
         this.usuarioCreacion = usuarioCreacion;
     }
 
-    public String getFechaModificacion() {
+    public Date getFechaModificacion() {
         return fechaModificacion;
     }
 
-    public void setFechaModificacion(String fechaModificacion) {
+    public void setFechaModificacion(Date fechaModificacion) {
         this.fechaModificacion = fechaModificacion;
     }
 

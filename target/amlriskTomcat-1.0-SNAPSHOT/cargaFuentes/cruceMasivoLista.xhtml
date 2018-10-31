@@ -17,7 +17,7 @@
                         <p:panel header="#{msj.subMnuCargaLista}" id="pnlCruceMasivoLista">
                             <p:panel id="pnlgCargaMasivoLista" >
                                 <p:growl id="messages" showDetail="true" />                           
-                                <p:fileUpload required="true" multiple="false" allowTypes="/(\.|\/)(txt)$/" label="#{msj.cargaArchivo}" cancelLabel="#{msj.cancelar}" uploadLabel="#{msj.carga}" fileUploadListener="#{cargaArchivoClienteController.cargarArchivoClienteListener}" update="btnCargandoArchivo"/>    
+                                <p:fileUpload required="true" multiple="false" allowTypes="/(\.|\/)(txt|xls|xlsx)$/" label="#{msj.cargaArchivo}" cancelLabel="#{msj.cancelar}" uploadLabel="#{msj.carga}" fileUploadListener="#{cargaArchivoClienteController.cargarArchivoClienteListener}" update="btnCargandoArchivo"/>    
                                 <br/>
                                 <br/>                     
                             </p:panel>    

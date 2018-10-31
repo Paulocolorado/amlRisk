@@ -48,8 +48,12 @@ public class MenuFacadeLocalImpl extends AbstractFacade<Menu> implements MenuFac
             throw new SisgriException("Error al consultar la base de datos" + e.getMessage());            
         }                      
         return listaMenu;
-    }
-
+    }    
+        
+    /**
+     * METODOS SET Y GET
+     */
+    
     public EntityManager getEm() {
         return em;
     }
@@ -66,10 +70,7 @@ public class MenuFacadeLocalImpl extends AbstractFacade<Menu> implements MenuFac
         this.emf = emf;
     }
     
-    
-    /**
-     * METODOS SET Y GET
-     */
+
     
     
 }

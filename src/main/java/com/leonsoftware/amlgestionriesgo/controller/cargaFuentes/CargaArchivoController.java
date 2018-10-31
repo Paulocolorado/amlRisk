@@ -52,12 +52,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -182,7 +178,7 @@ public class CargaArchivoController implements Serializable{
         List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
         List<ListaIdRestriccion> listaIdRestriccionCollection = new ArrayList<ListaIdRestriccion>();
         try {            
-            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            Integer idArchivo = EJBArchivo.obtenerIdSigArchivo();
             File inputFile = new File(this.archivoTemporal.toString());
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -252,7 +248,7 @@ public class CargaArchivoController implements Serializable{
         List<ListaRestriccion> listaRestriccionCollection = new ArrayList<ListaRestriccion>();
         int sigIdLista = 0;
         try {            
-            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            Integer idArchivo = EJBArchivo.obtenerIdSigArchivo();
             File inputFile = new File(this.archivoTemporal.toString());
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -326,7 +322,7 @@ public class CargaArchivoController implements Serializable{
         Calendar fechaReporte = null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         try {  
-            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            Integer idArchivo = EJBArchivo.obtenerIdSigArchivo();
             FileInputStream entrada = new FileInputStream(this.archivoTemporal.toString());
             BufferedReader buffer = new BufferedReader(new InputStreamReader(entrada));
             String strLinea;
@@ -402,7 +398,7 @@ public class CargaArchivoController implements Serializable{
         fechaReporte = Calendar.getInstance(); 
         boolean tieneID = false;
         try{
-            Integer idArchivo = EJBArchivo.obtnerIdSigArchivo();
+            Integer idArchivo = EJBArchivo.obtenerIdSigArchivo();
             FileInputStream entrada = new FileInputStream(this.archivoTemporal.toString());             
             XSSFWorkbook workbook = new XSSFWorkbook(entrada);
             XSSFSheet sheet = workbook.getSheetAt(ConstantesSisgri.INDICE_INICIAL);
