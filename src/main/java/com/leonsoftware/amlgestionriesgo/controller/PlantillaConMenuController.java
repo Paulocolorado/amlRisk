@@ -79,7 +79,7 @@ public class PlantillaConMenuController implements Serializable{
     
     public void establecerPermisos(){
         for(Menu menu : this.listaMenu){
-            if(menu.getTipoMenu().equals(ConstantesSisgri.MENU_SUBMENU) && menu.getTipoUsuario().equals(this.usuario.getUsuarioPK().getTipoIdUsuario())){
+            if(menu.getTipoMenu().equals(ConstantesSisgri.MENU_SUBMENU) && menu.getTipoUsuario().equals(this.usuario.getTipoUsuario())){
                 DefaultSubMenu firstSubMenu = new DefaultSubMenu(menu.getNombreMenu()); 
                 for(Menu i : this.listaMenu){
                     Menu submenu = i.getCodigoSubmenu();
@@ -93,7 +93,7 @@ public class PlantillaConMenuController implements Serializable{
                 }
                 model.addElement(firstSubMenu);
             }else{
-                if(menu.getCodigoSubmenu() == null && menu.getTipoUsuario().equals(this.usuario.getUsuarioPK().getTipoIdUsuario())){
+                if(menu.getCodigoSubmenu() == null && menu.getTipoUsuario().equals(this.usuario.getTipoUsuario())){
                     DefaultMenuItem item = new DefaultMenuItem(menu.getNombreMenu());
                     item.setUrl(menu.getUrlMenu());
                     this.model.addElement(item);

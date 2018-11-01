@@ -52,6 +52,8 @@ public class Usuario implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
+	@Column(name="tipo_usuario")
+	private String tipoUsuario;
     @Column(name = "nombre_usuario")
     private String nombreUsuario;
     @Basic(optional = false)
@@ -218,7 +220,15 @@ public class Usuario implements Serializable {
         this.archivoFuenteCollection = archivoFuenteCollection;
     }
 
-    @Override
+    public String getTipoUsuario() {
+		return tipoUsuario;
+	}
+
+	public void setTipoUsuario(String tipoUsuario) {
+		this.tipoUsuario = tipoUsuario;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (usuarioPK != null ? usuarioPK.hashCode() : 0);
