@@ -17,17 +17,19 @@
                     <p:panel header="#{msj.recordarClave}" id="pnlRecordarClave" style="margin-bottom:20px; width: 200%; margin-left: -175px;">
                         <h:panelGrid id="pnlgRecordarClave" columns="2" width="100%" style="margin-left: 30%">
                             <p:outputLabel for="nombreUsuerio" value="#{msj.usuario}"  />
-                            <p:inputText id="nombreUsuerio" required="true"  value="#{recordarClaveController.usuario.usuario}" tabindex="1"/>                       
+                            <p:inputText id="nombreUsuerio" required="true"  value="#{gestionUsuarioController.usuario.usuario}" tabindex="1"/>                       
                             <h:column/>    
                             <br/>
                             <br/>
                         </h:panelGrid>
                         <center>
-                            <p:commandButton value="#{msj.recordarClave}" action="#{recordarClaveController.recordarClave()}" tabindex="2" update="@form" />
+                            <p:commandButton value="#{msj.recordarClave}" action="#{gestionUsuarioController.recordarClave()}" tabindex="2" update="@form" />
+                            <p:spacer width="20" />
+                            <p:commandButton value="#{msj.inicio}" action="/autenticacion.xhtml" tabindex="3" process="@this"/>
                         </center>
                         <br/>
                         <p:separator/>
-                        <h:outputLabel value="#{msj.laClavesera} #{recordarClaveController.correoEncriptado}"/> <!--Aca se debe realizar un comando que muestre el correo llamado de la BDD  -->
+                        <h:outputLabel value="#{msj.laClavesera} #{gestionUsuarioController.correoEncriptado}"/>
                     </p:panel>        
                 </h:form>  
             </ui:define>

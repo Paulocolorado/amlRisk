@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    
+    <head>
+        <link href="../resources/css/styles.css" rel="stylesheet" type="text/css"/>
+</head>
+    <body>
+
+        <ui:composition template="./../plantillas/plantillaConMenu.xhtml">
+            <ui:define name="content">
+                <f:event type="preRenderView" listener="#{gestionUsuarioController.iniciarListas()}" />
+                <h:form id="frmAdministrarUsuario" enctype="multipart/form-data" >
+                    <h:panelGrid id="pnlgAdministrarUsuario" style="width:100%">
+                        <p:panel id="pnlAdministrarUsuario" header="#{msj.editarUsuario}">
+                            <h:panelGrid columns="4" style="width:100%" cellpadding="10px"> 
+                                
+                                <p:outputLabel for="idUsuario" value="#{msj.numIdCliente}"  />
+                                <p:inputText id="idUsuario" placeholder="#{msj.numIdCliente}" value="#{gestionUsuarioController.usuarioSeleccion.usuarioPK.idUsuario}" tabindex="1" maxlength="40" size="40" disabled="true"/>                                
+                
+                                <p:outputLabel for="listaTipoIdUsuario" value="#{msj.tipoIdCliente}"/>
+                                <p:selectOneMenu id="listaTipoIdUsuario" value="#{gestionUsuarioController.usuarioSeleccion.usuarioPK.tipoIdUsuario}" tabindex="2" style="width:150px" disabled="true">
+                                    <f:selectItems value="#{gestionUsuarioController.listaTipoIdUsuario}"  var="listaTipoIdUsuario" itemLabel="#{listaTipoIdUsuario.listaCatalogoPK.nombreListaCatalogo}" itemValue="#{listaTipoIdUsuario.listaCatalogoPK.valorListaCatalogo}"/>
+                                </p:selectOneMenu>
+                                
+                                <p:outputLabel for="nombreUsuario" value="#{msj.nombre}"  />
+                                <p:inputText id="nombreUsuario"  value="#{gestionUsuarioController.usuarioSeleccion.nombreUsuario}" tabindex="3" maxlength="40" size="40" disabled="true" />                                
+                               
+                                <p:outputLabel for="apellidoUsuario" value="#{msj.apellidoUsuario}"  />
+                                <p:inputText id="apellidoUsuario" placeholder="#{msj.apellidoUsuario}" value="#{gestionUsuarioController.usuarioSeleccion.apellidoUsuario}" tabindex="4" maxlength="40" size="40"/>                                
+
+                                <p:outputLabel for="usuario" value="#{msj.nombreUsuario}"  />
+                                <p:inputText id="usuario" placeholder="#{msj.nombreUsuario}" value="#{gestionUsuarioController.usuarioSeleccion.usuario}" tabindex="5" maxlength="40" size="40"/>
+                                
+                                <p:outputLabel for="correoUsuario" value="#{msj.correoID}"  />
+                                <p:inputText id="correoUsuario" placeholder="#{msj.correoID}" value="#{gestionUsuarioController.usuarioSeleccion.correoUsuario}" tabindex="6" maxlength="40" size="40" validatorMessage="#{msj.mailInvalido}"> 
+                                <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                </p:inputText>
+                                
+                                <p:outputLabel for="claveUsuario" value="#{msj.nuevaClave}"  />
+                                <p:password id="claveUsuario" placeholder="#{msj.nuevaClave}" value="#{gestionUsuarioController.usuarioSeleccion.claveUsuario}" tabindex="7" required="true" feedback="true" maxlength="15" promptLabel="#{msj.ingreseClave}"
+                                            validatorMessage="#{msj.noCoinciden}" weakLabel="#{msj.debil}" strongLabel="#{msj.fuerte}" goodLabel="#{msj.buena}"
+                                            match="claveUsuarioRep" size="40"/>                            
+
+                                <p:outputLabel for="claveUsuarioRep" value="#{msj.confirmarClave}"  />
+                                <p:password id="claveUsuarioRep" placeholder="#{msj.confirmarClave}"  tabindex="8" maxlength="15" size="40"/> 
+                                
+
+                                <p:outputLabel for="listaTipoUsuario" value="#{msj.tipoUsuario}"/>
+                                <p:selectOneMenu id="listaTipoUsuario" value="#{gestionUsuarioController.usuarioSeleccion.tipoUsuario}" style="width:150px" tabindex="9" >
+                                    <f:selectItems value="#{gestionUsuarioController.listaTipoUsuario}"  var="listaTipoUsuario" itemLabel="#{listaTipoUsuario.listaCatalogoPK.nombreListaCatalogo}" itemValue="#{listaTipoUsuario.listaCatalogoPK.valorListaCatalogo}" />
+                                </p:selectOneMenu>
+                                
+
+                            <f:facet name="footer" >
+                                 <center>
+                                    <p:commandButton id="btnGuardar" value="#{msj.guardar}" tabindex="10" />                                                                           
+                                    <p:blockUI block=":frmAdministrarUsuario:pnlAdministrarUsuario" trigger="btnGuardar" >
+                                        #{msj.procesando}<br/>
+                                        <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
+                                     </p:blockUI>
+                                </center>
+                            </f:facet>                         
+                           </h:panelGrid>       
+                        </p:panel>   
+                    </h:panelGrid>    
+
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

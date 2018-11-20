@@ -45,6 +45,12 @@
             <managed-bean-class>com.leonsoftware.amlgestionriesgo.controller.gestionUsuario.RecordarClaveController</managed-bean-class>
             <managed-bean-scope>view</managed-bean-scope>
         </managed-bean>
+        
+        <managed-bean>
+            <managed-bean-name>gestionUsuarioController</managed-bean-name>
+            <managed-bean-class>com.leonsoftware.amlgestionriesgo.controller.gestionUsuario.GestionUsuarioController</managed-bean-class>
+            <managed-bean-scope>view</managed-bean-scope>
+        </managed-bean>        
 
     <application>
         <message-bundle>com.leonsoftware.amlgestionriesgo.properties.mensajes</message-bundle>

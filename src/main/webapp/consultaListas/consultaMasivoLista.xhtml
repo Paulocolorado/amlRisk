@@ -75,7 +75,7 @@
                                                 <h:outputText value="#{clienteCruce.nombreFuente}" />
                                             </p:column>
 
-                                            <p:column headerText="#{msj.porcentajeCoincidencia}">
+                                            <p:column headerText="#{msj.porcentajeCoincidencia}" sortBy="#{clienteCruce.porcentaje}">
                                                 <h:outputText value="#{clienteCruce.porcentaje}" />
                                             </p:column>                               
                                         </p:dataTable>  

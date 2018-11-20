@@ -7,6 +7,7 @@ package com.leonsoftware.amlgestionriesgo.ejb;
 
 import com.leonsoftware.amlgestionriesgo.exception.SisgriException;
 import com.leonsoftware.amlgestionriesgo.model.Usuario;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -18,4 +19,10 @@ public interface UsuarioFacadeLocal {
      Usuario iniciarSesion (Usuario pUsuario) throws SisgriException;
      
      Usuario recuperarUsuarioPorNombre (Usuario pUsuario) throws SisgriException;
+     
+     List<Usuario> buscarUsuario(Usuario pUsuario) throws SisgriException;
+     
+     public void guardarUsuario(Usuario pUsuario) throws SisgriException;
+     
+
 }

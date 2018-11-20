@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./../plantillas/plantillaConMenu.xhtml">
+            <ui:define name="content">
+                
+				
+                <h:form id="frmBuscarUsuario" enctype="multipart/form-data">
+                    <h:panelGrid id="pnlgBuscarUsuario" style="width:100%">
+                        <p:panel  id="pnlBuscarUsuario" header="#{msj.buscarUsuario}">
+                            <h:panelGrid columns="4" style="width:100%" cellpadding="10px"> 
+                                
+                                <p:outputLabel for="nombreUsuario" value="#{msj.nombreCompletoID}"  />
+                                <p:inputText id="nombreUsuario" value="#{gestionUsuarioController.usuario.nombreUsuario}" tabindex="1" maxlength="40" size="40"/>                                
+
+
+                                <p:outputLabel for="usuario" value="#{msj.usuario}"/>
+                                <p:inputText id="usuario" value="#{gestionUsuarioController.usuario.usuario}" tabindex="2" maxlength="40" size="40"/>  
+
+                                <f:facet name="footer" >
+                                    
+                                    <center>  
+                                <p:commandButton id="btnBuscar" value="#{msj.buscar}"  update="frmBuscarUsuario" action="#{gestionUsuarioController.buscarCoincidencia()}" tabindex="4"/>
+                                <p:blockUI block=":frmBuscarUsuario:pnlBuscarUsuario" trigger="btnBuscar">
+                                    #{msj.buscandoCoincidencias}<br/>
+                                     <p:graphicImage name="demo/images/ajaxloadingbar.gif"/>
+                                </p:blockUI>
+                                <p:spacer width="20" />
+                                <p:commandButton id="btnLimpiar" value="#{msj.limpiar}"  update="frmBuscarUsuario" action="#{gestionUsuarioController.limpiarFormulario()}" tabindex="5"/>
+                            </center>    
+                            <br/>
+                            <br/>                                           
+                            <p:panel id="pnlResultadoConsultaLista" header="#{msj.resultadoConsulta}" rendered="#{gestionUsuarioController.visualizaResultado}"> 
+                                <p:dataTable id="dtUsuarioCoincide" var="usuarioCoincide" value="#{gestionUsuarioController.listaUsuario}" paginator="true" rows="10" styleClass="paginated" emptyMessage="#{msj.mensajeNoEncontro}" paginatorPosition="bottom"  >
+                                    
+                                    <p:column headerText="#{msj.nombreUsuario}">
+                                        <h:outputText value="#{usuarioCoincide.nombreUsuario}" />
+                                    </p:column>
+
+                                    <p:column headerText="#{msj.apellidoUsuario}">
+                                        <h:outputText value="#{usuarioCoincide.apellidoUsuario}" />
+                                    </p:column>
+
+                                    <p:column headerText="#{msj.usuarioID}">
+                                        <h:outputText value="#{usuarioCoincide.usuario}" />
+                                    </p:column>
+
+                         <!--          <p:column headerText="#{msj.accion}">
+                                        <center>  
+                                        <p:commandButton action="#{gestionUsuarioController.editarUsuario()}" value="#{msj.editar}" immediate="true" update="@this">
+                                            <f:setPropertyActionListener target="#{gestionUsuarioController.usuarioSeleccion}" value="#{usuarioCoincide}" rendered="true" /> 
+                                        </p:commandButton>
+                                        <p:spacer width="20" />
+                                        <p:commandButton action="#{gestionUsuarioController.eliminarUsuario()}" value="#{msj.eliminar}" immediate="true" update="@this">
+                                            <f:setPropertyActionListener target="#{gestionUsuarioController.usuarioSeleccion}" value="#{usuarioCoincide}" rendered="true" /> 
+                                        </p:commandButton>
+                                        </center>
+                                    </p:column> -->
+                                    
+                                    
+                                     
+
+                                </p:dataTable> 
+                                <f:facet name="footer" >
+                                    <center>
+                                        <h:commandLink value="#{msj.descarga}">                                         
+                                            <p:dataExporter type="csv" target="dtUsuarioCoincide" fileName="#{msj.descarga}" />
+                                        </h:commandLink>
+                                    </center>
+                                </f:facet>    
+                            </p:panel>
+                                    </f:facet>
+                           </h:panelGrid>       
+                        </p:panel>   
+                    </h:panelGrid>    
+
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

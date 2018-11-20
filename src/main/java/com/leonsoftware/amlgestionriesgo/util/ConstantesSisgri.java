@@ -57,5 +57,11 @@ public class ConstantesSisgri {
         
     public static final String EXTENSION_EXCEL = "xls";
     public static final String MSJ_ERROR_EXCEL_VACIO = "";
+	//public static final String MSJ_USUARIOCREADO = null;
+    public static final String MSJ_USUARIOCREADO = "usuarioCreado";
+	
+    public static final String LISTA_ID = "TIPO_ID";
+    public static final String LISTA_TIPOUSUARIO = "TIPO_USUARIO";
+ 
 
 }

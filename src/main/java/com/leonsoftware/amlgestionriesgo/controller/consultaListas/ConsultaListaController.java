@@ -33,7 +33,7 @@ import javax.inject.Named;
  * @version 1.0
  */
 @Named
-@ViewScoped   
+@ViewScoped   //aplicationscoped
 public class ConsultaListaController implements Serializable{
     
     private static final Logger LOGGER = Logger.getLogger("ConsultaListaController"); 

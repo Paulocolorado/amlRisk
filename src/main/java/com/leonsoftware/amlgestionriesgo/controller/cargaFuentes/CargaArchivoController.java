@@ -412,20 +412,21 @@ public class CargaArchivoController implements Serializable{
                 listaIdRestriccion.setListaIdRestriccionPK(new ListaIdRestriccionPK());
                 Iterator<Cell> cellIterator = row.cellIterator();
                 Cell celda;
+                tieneID = false;
                 while (cellIterator.hasNext()) {
                     celda = cellIterator.next();
                     switch(celda.getColumnIndex()) {
                         case 0:  
-                            if(celda != null){
-                                listaIdRestriccion.setTipoId(celda.toString());
+                            if (celda != null){
+                                listaIdRestriccion.setTipoId(celda == null ? ConstantesSisgri.VACIO : celda.toString());
                                 tieneID = true;
-                            }
+                             }
                             break;
                         case 1:
                             if(celda != null){
                                 listaIdRestriccion.setNumeroId(celda == null ? ConstantesSisgri.VACIO : celda.toString());
                                 tieneID = true;
-                            }    
+                            }  
                             break;
                         case 2: 
                             if(celda != null){
