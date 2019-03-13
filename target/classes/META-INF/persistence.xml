@@ -14,10 +14,10 @@
     <class>com.leonsoftware.amlgestionriesgo.model.ClienteMasivo</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
-      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/bd_sisgri"/>
-      <property name="javax.persistence.jdbc.user" value="usuSisgri"/>
-      <property name="javax.persistence.jdbc.password" value="Sisgri12345"/>
+      <property name="javax.persistence.jdbc.driver" value="xxxx"/>
+      <property name="javax.persistence.jdbc.url" value="xxxx"/>
+      <property name="javax.persistence.jdbc.user" value="xxxxxx"/>
+      <property name="javax.persistence.jdbc.password" value="xxxxxx"/>
     </properties>
   </persistence-unit>
 </persistence>
